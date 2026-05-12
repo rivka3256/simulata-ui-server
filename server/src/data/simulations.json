@@ -1,0 +1,346 @@
+[
+  {
+    "simulation_config_id": "sc-0001-aaaa-bbbb-cccc-dddddddddddd",
+    "scenario_name": "GridOps Full Test",
+    "created_at": "2024-11-01T08:00:00.000Z",
+    "productions": [
+      {
+        "production_config_id": "pc-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "contracts": [
+          {
+            "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "1.0.0",
+            "dataReader": {
+              "data_reader_id": "dr-0001-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0001-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          },
+          {
+            "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "1.0.0",
+            "dataReader": {
+              "data_reader_id": "dr-0002-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 50,
+              "message_frequency_hz": 5
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0002-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 50,
+              "message_frequency_hz": 5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "sc-0002-aaaa-bbbb-cccc-dddddddddddd",
+    "scenario_name": "Analysis Wizard",
+    "created_at": "2024-11-05T09:30:00.000Z",
+    "productions": [
+      {
+        "production_config_id": "pc-0002-aaaa-bbbb-cccc-dddddddddddd",
+        "contracts": [
+          {
+            "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "2.1.0",
+            "dataReader": {
+              "data_reader_id": "dr-0003-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 200,
+              "message_frequency_hz": 20
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0003-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 200,
+              "message_frequency_hz": 20
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "sc-0003-aaaa-bbbb-cccc-dddddddddddd",
+    "scenario_name": "Odin System Check",
+    "created_at": "2024-11-10T14:00:00.000Z",
+    "productions": [
+      {
+        "production_config_id": "pc-0003-aaaa-bbbb-cccc-dddddddddddd",
+        "contracts": [
+          {
+            "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "3.0.0",
+            "dataReader": {
+              "data_reader_id": "dr-0004-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 500,
+              "message_frequency_hz": 50
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0004-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 500,
+              "message_frequency_hz": 50
+            }
+          },
+          {
+            "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "3.0.0",
+            "dataReader": {
+              "data_reader_id": "dr-0005-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 300,
+              "message_frequency_hz": 30
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0005-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 300,
+              "message_frequency_hz": 30
+            }
+          }
+        ]
+      },
+      {
+        "production_config_id": "pc-0004-aaaa-bbbb-cccc-dddddddddddd",
+        "contracts": [
+          {
+            "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "3.0.1",
+            "dataReader": {
+              "data_reader_id": "dr-0006-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0006-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "sc-0004-aaaa-bbbb-cccc-dddddddddddd",
+    "scenario_name": "Tesla Integration",
+    "created_at": "2024-11-20T11:15:00.000Z",
+    "productions": [
+      {
+        "production_config_id": "pc-0005-aaaa-bbbb-cccc-dddddddddddd",
+        "contracts": [
+          {
+            "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
+            "version": "1.5.0",
+            "dataReader": {
+              "data_reader_id": "dr-0007-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 10,
+              "message_frequency_hz": 1
+            },
+            "dataWriter": {
+              "data_writer_id": "dw-0007-aaaa-bbbb-cccc-dddddddddddd",
+              "message_count": 10,
+              "message_frequency_hz": 1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "sc-9999",
+    "scenario_name": "Test Postman Simulation",
+    "created_at": "2026-05-12T06:37:11.285Z",
+    "productions": [
+      {
+        "production_config_id": "pc-1111",
+        "contracts": [
+          {
+            "version": "1.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "9563a146-3503-4567-b0bc-47030423c9a3",
+    "scenario_name": "ex1",
+    "created_at": "2026-05-12T08:31:04.607Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "16387158-aa5b-4a66-8c03-2fa3ee5511f3",
+    "scenario_name": "ex2",
+    "created_at": "2026-05-12T08:33:59.894Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "9f6efdd2-05f4-4f0d-b175-7189247107e0",
+    "scenario_name": "shob",
+    "created_at": "2026-05-12T08:38:09.547Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "98f94db0-2276-431c-a5f8-888b4797e7d7",
+    "scenario_name": "ex3",
+    "created_at": "2026-05-12T08:54:00.485Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "f90747f5-8c24-4cd7-8cd5-ea245ca01a17",
+    "scenario_name": "ex4",
+    "created_at": "2026-05-12T08:58:00.086Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "simulation_config_id": "cadf15d3-b1e6-4b39-91bb-24663a34608e",
+    "scenario_name": "bbjlbl",
+    "created_at": "2026-05-12T17:43:48.518Z",
+    "productions": [
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataWriter": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      },
+      {
+        "contracts": [
+          {
+            "version": "1.0.0",
+            "dataReader": {
+              "message_count": 100,
+              "message_frequency_hz": 10
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

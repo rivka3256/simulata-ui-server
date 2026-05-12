@@ -1,0 +1,275 @@
+[
+  {
+    "simulation_run_id": "sr-0001-aaaa-bbbb-cccc-dddddddddddd",
+    "simulation_config_id": "sc-0001-aaaa-bbbb-cccc-dddddddddddd",
+    "status": "passed",
+    "start_time": "2024-11-01T10:00:00.000Z",
+    "end_time": "2024-11-01T10:00:04.231Z",
+    "logs": [
+      {
+        "logs_result_id": "lr-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "SensorData",
+          "count": 100,
+          "timestamps": ["2024-11-01T10:00:00.100Z", "2024-11-01T10:00:00.200Z"]
+        },
+        "message_received": {
+          "topic": "SensorData",
+          "count": 100,
+          "timestamps": ["2024-11-01T10:00:00.115Z", "2024-11-01T10:00:00.215Z"]
+        }
+      },
+      {
+        "logs_result_id": "lr-0002-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "CommandData",
+          "count": 50,
+          "timestamps": ["2024-11-01T10:00:01.000Z", "2024-11-01T10:00:01.200Z"]
+        },
+        "message_received": {
+          "topic": "CommandData",
+          "count": 50,
+          "timestamps": ["2024-11-01T10:00:01.012Z", "2024-11-01T10:00:01.212Z"]
+        }
+      }
+    ],
+    "analysis": {
+      "analyzed_simulation_result_id": "ar-0001-aaaa-bbbb-cccc-dddddddddddd",
+      "calculated_latency": 12.5,
+      "lost_message_count": 0,
+      "anomalies": null,
+      "s3_link": "s3://simulata-results/runs/sr-0001/report.json",
+      "contractResults": [
+        {
+          "contract_result_id": "cr-0001-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 12.5,
+          "throughput": 100.0,
+          "error_details": null,
+          "error_count": 0
+        },
+        {
+          "contract_result_id": "cr-0002-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 11.8,
+          "throughput": 50.0,
+          "error_details": null,
+          "error_count": 0
+        }
+      ]
+    }
+  },
+  {
+    "simulation_run_id": "sr-0002-aaaa-bbbb-cccc-dddddddddddd",
+    "simulation_config_id": "sc-0002-aaaa-bbbb-cccc-dddddddddddd",
+    "status": "failed",
+    "start_time": "2024-11-05T11:00:00.000Z",
+    "end_time": "2024-11-05T11:00:07.812Z",
+    "logs": [
+      {
+        "logs_result_id": "lr-0003-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "MetricsTopic",
+          "count": 200,
+          "timestamps": ["2024-11-05T11:00:00.100Z"]
+        },
+        "message_received": {
+          "topic": "MetricsTopic",
+          "count": 183,
+          "timestamps": ["2024-11-05T11:00:00.118Z"]
+        }
+      }
+    ],
+    "analysis": {
+      "analyzed_simulation_result_id": "ar-0002-aaaa-bbbb-cccc-dddddddddddd",
+      "calculated_latency": 45.3,
+      "lost_message_count": 17,
+      "anomalies": {
+        "high_latency_spikes": 3,
+        "dropped_packets": 17
+      },
+      "s3_link": "s3://simulata-results/runs/sr-0002/report.json",
+      "contractResults": [
+        {
+          "contract_result_id": "cr-0003-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 45.3,
+          "throughput": 183.0,
+          "error_details": "17 messages lost due to QoS mismatch on MetricsTopic",
+          "error_count": 17
+        }
+      ]
+    }
+  },
+  {
+    "simulation_run_id": "sr-0003-aaaa-bbbb-cccc-dddddddddddd",
+    "simulation_config_id": "sc-0003-aaaa-bbbb-cccc-dddddddddddd",
+    "status": "passed",
+    "start_time": "2024-11-10T14:30:00.000Z",
+    "end_time": "2024-11-10T14:30:09.554Z",
+    "logs": [
+      {
+        "logs_result_id": "lr-0004-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "SensorData",
+          "count": 500,
+          "timestamps": ["2024-11-10T14:30:00.100Z"]
+        },
+        "message_received": {
+          "topic": "SensorData",
+          "count": 500,
+          "timestamps": ["2024-11-10T14:30:00.108Z"]
+        }
+      },
+      {
+        "logs_result_id": "lr-0005-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "CommandData",
+          "count": 300,
+          "timestamps": ["2024-11-10T14:30:01.000Z"]
+        },
+        "message_received": {
+          "topic": "CommandData",
+          "count": 300,
+          "timestamps": ["2024-11-10T14:30:01.009Z"]
+        }
+      },
+      {
+        "logs_result_id": "lr-0006-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "GlobalStatus",
+          "count": 100,
+          "timestamps": ["2024-11-10T14:30:02.000Z"]
+        },
+        "message_received": {
+          "topic": "GlobalStatus",
+          "count": 100,
+          "timestamps": ["2024-11-10T14:30:02.007Z"]
+        }
+      }
+    ],
+    "analysis": {
+      "analyzed_simulation_result_id": "ar-0003-aaaa-bbbb-cccc-dddddddddddd",
+      "calculated_latency": 8.2,
+      "lost_message_count": 0,
+      "anomalies": null,
+      "s3_link": "s3://simulata-results/runs/sr-0003/report.json",
+      "contractResults": [
+        {
+          "contract_result_id": "cr-0004-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 8.0,
+          "throughput": 500.0,
+          "error_details": null,
+          "error_count": 0
+        },
+        {
+          "contract_result_id": "cr-0005-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 9.0,
+          "throughput": 300.0,
+          "error_details": null,
+          "error_count": 0
+        },
+        {
+          "contract_result_id": "cr-0006-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 7.5,
+          "throughput": 100.0,
+          "error_details": null,
+          "error_count": 0
+        }
+      ]
+    }
+  },
+  {
+    "simulation_run_id": "sr-0004-aaaa-bbbb-cccc-dddddddddddd",
+    "simulation_config_id": "sc-0001-aaaa-bbbb-cccc-dddddddddddd",
+    "status": "failed",
+    "start_time": "2024-11-12T09:00:00.000Z",
+    "end_time": "2024-11-12T09:00:05.100Z",
+    "logs": [
+      {
+        "logs_result_id": "lr-0007-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "SensorData",
+          "count": 100,
+          "timestamps": ["2024-11-12T09:00:00.100Z"]
+        },
+        "message_received": {
+          "topic": "SensorData",
+          "count": 72,
+          "timestamps": ["2024-11-12T09:00:00.130Z"]
+        }
+      }
+    ],
+    "analysis": {
+      "analyzed_simulation_result_id": "ar-0004-aaaa-bbbb-cccc-dddddddddddd",
+      "calculated_latency": 88.7,
+      "lost_message_count": 28,
+      "anomalies": {
+        "timeout_events": 5,
+        "dropped_packets": 28,
+        "qos_violations": 2
+      },
+      "s3_link": "s3://simulata-results/runs/sr-0004/report.json",
+      "contractResults": [
+        {
+          "contract_result_id": "cr-0007-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 88.7,
+          "throughput": 72.0,
+          "error_details": "28 messages dropped - network congestion detected. 2 QoS policy violations.",
+          "error_count": 28
+        }
+      ]
+    }
+  },
+  {
+    "simulation_run_id": "sr-0005-aaaa-bbbb-cccc-dddddddddddd",
+    "simulation_config_id": "sc-0004-aaaa-bbbb-cccc-dddddddddddd",
+    "status": "passed",
+    "start_time": "2024-11-20T12:00:00.000Z",
+    "end_time": "2024-11-20T12:00:02.310Z",
+    "logs": [
+      {
+        "logs_result_id": "lr-0008-aaaa-bbbb-cccc-dddddddddddd",
+        "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
+        "message_sent": {
+          "topic": "TelemetryStream",
+          "count": 10,
+          "timestamps": ["2024-11-20T12:00:00.100Z"]
+        },
+        "message_received": {
+          "topic": "TelemetryStream",
+          "count": 10,
+          "timestamps": ["2024-11-20T12:00:00.105Z"]
+        }
+      }
+    ],
+    "analysis": {
+      "analyzed_simulation_result_id": "ar-0005-aaaa-bbbb-cccc-dddddddddddd",
+      "calculated_latency": 5.1,
+      "lost_message_count": 0,
+      "anomalies": null,
+      "s3_link": "s3://simulata-results/runs/sr-0005/report.json",
+      "contractResults": [
+        {
+          "contract_result_id": "cr-0008-aaaa-bbbb-cccc-dddddddddddd",
+          "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
+          "latency_avg_ms": 5.1,
+          "throughput": 10.0,
+          "error_details": null,
+          "error_count": 0
+        }
+      ]
+    }
+  }
+]

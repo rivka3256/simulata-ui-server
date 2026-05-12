@@ -1,0 +1,125 @@
+[
+  {
+    "production_config_id": "pc-0001-aaaa-bbbb-cccc-dddddddddddd",
+    "contracts": [
+      {
+        "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "1.0.0",
+        "dataReader": {
+          "data_reader_id": "dr-0001-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 100,
+          "message_frequency_hz": 10
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0001-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 100,
+          "message_frequency_hz": 10
+        }
+      },
+      {
+        "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "1.0.0",
+        "dataReader": {
+          "data_reader_id": "dr-0002-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 50,
+          "message_frequency_hz": 5
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0002-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 50,
+          "message_frequency_hz": 5
+        }
+      }
+    ]
+  },
+  {
+    "production_config_id": "pc-0002-aaaa-bbbb-cccc-dddddddddddd",
+    "contracts": [
+      {
+        "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "2.1.0",
+        "dataReader": {
+          "data_reader_id": "dr-0003-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 200,
+          "message_frequency_hz": 20
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0003-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 200,
+          "message_frequency_hz": 20
+        }
+      }
+    ]
+  },
+  {
+    "production_config_id": "pc-0003-aaaa-bbbb-cccc-dddddddddddd",
+    "contracts": [
+      {
+        "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "3.0.0",
+        "dataReader": {
+          "data_reader_id": "dr-0004-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 500,
+          "message_frequency_hz": 50
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0004-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 500,
+          "message_frequency_hz": 50
+        }
+      },
+      {
+        "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "3.0.0",
+        "dataReader": {
+          "data_reader_id": "dr-0005-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 300,
+          "message_frequency_hz": 30
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0005-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 300,
+          "message_frequency_hz": 30
+        }
+      }
+    ]
+  },
+  {
+    "production_config_id": "pc-0004-aaaa-bbbb-cccc-dddddddddddd",
+    "contracts": [
+      {
+        "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "3.0.1",
+        "dataReader": {
+          "data_reader_id": "dr-0006-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 100,
+          "message_frequency_hz": 10
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0006-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 100,
+          "message_frequency_hz": 10
+        }
+      }
+    ]
+  },
+  {
+    "production_config_id": "pc-0005-aaaa-bbbb-cccc-dddddddddddd",
+    "contracts": [
+      {
+        "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
+        "version": "1.5.0",
+        "dataReader": {
+          "data_reader_id": "dr-0007-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 10,
+          "message_frequency_hz": 1
+        },
+        "dataWriter": {
+          "data_writer_id": "dw-0007-aaaa-bbbb-cccc-dddddddddddd",
+          "message_count": 10,
+          "message_frequency_hz": 1
+        }
+      }
+    ]
+  }
+]

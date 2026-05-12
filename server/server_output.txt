@@ -1,0 +1,246 @@
+
+> simulata-server@1.0.0 dev
+> tsx watch src/index.ts
+
+Server running on http://localhost:3000
+7:40:21 [tsx] change in ./src\controllers\simulationController.ts Restarting...
+cServer running on http://localhost:3000
+7:40:27 [tsx] change in ./src\routes\simulations.routes.ts Restarting...
+cServer running on http://localhost:3000
+7:40:34 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+7:42:33 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+7:42:43 [tsx] unlink in ./src\routes\simulations.routes.ts Restarting...
+cServer running on http://localhost:3000
+8:43:29 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+9:36:21 [tsx] change in ./src\controllers\simulation.controller.ts Restarting...
+cServer running on http://localhost:3000
+9:36:27 [tsx] change in ./src\routes\simulation.routes.ts Restarting...
+cServer running on http://localhost:3000
+11:19:14 [tsx] change in ./src\app.ts Rerunning...
+cServer running on http://localhost:3000
+11:19:16 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+11:19:35 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+11:19:42 [tsx] change in ./src\app.ts Restarting...
+cc:\Users\user\Desktop\the_project\simulata\server\src\app.ts:9
+app.use(cors());
+    ^
+
+ReferenceError: cors is not defined
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\app.ts:9:5)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+11:19:47 [tsx] change in ./src\app.ts Rerunning...
+c
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [TransformError]: Transform failed with 1 error:
+c:\Users\user\Desktop\the_project\simulata\server\src\app.ts:7:0: ERROR: Unexpected "const"
+    at failureErrorWithLog (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1748:15)
+    at c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1017:50
+    at responseCallbacks.<computed> (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+Node.js v24.15.0
+11:19:50 [tsx] change in ./src\app.ts Rerunning...
+c
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [TransformError]: Transform failed with 1 error:
+c:\Users\user\Desktop\the_project\simulata\server\src\app.ts:7:0: ERROR: Expected "from" but found "const"
+    at failureErrorWithLog (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1748:15)
+    at c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1017:50
+    at responseCallbacks.<computed> (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+Node.js v24.15.0
+11:19:52 [tsx] change in ./src\app.ts Rerunning...
+c
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [TransformError]: Transform failed with 1 error:
+c:\Users\user\Desktop\the_project\simulata\server\src\app.ts:7:0: ERROR: Expected "from" but found "const"
+    at failureErrorWithLog (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1748:15)
+    at c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1017:50
+    at responseCallbacks.<computed> (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+Node.js v24.15.0
+11:19:54 [tsx] change in ./src\app.ts Rerunning...
+c
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [TransformError]: Transform failed with 1 error:
+c:\Users\user\Desktop\the_project\simulata\server\src\app.ts:7:0: ERROR: Expected "from" but found "const"
+    at failureErrorWithLog (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1748:15)
+    at c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:1017:50
+    at responseCallbacks.<computed> (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (c:\Users\user\Desktop\the_project\simulata\server\node_modules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+Node.js v24.15.0
+11:19:55 [tsx] change in ./src\app.ts Rerunning...
+cServer running on http://localhost:3000
+11:19:58 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+11:20:00 [tsx] change in ./src\app.ts Restarting...
+cServer running on http://localhost:3000
+11:33:13 [tsx] change in ./src\controllers\simulation.controller.ts Rerunning...
+cServer running on http://localhost:3000
+11:33:14 [tsx] change in ./src\controllers\simulation.controller.ts Restarting...
+cnode:events:487
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:2008:16)
+    at listenInCluster (node:net:2065:12)
+    at Server.listen (node:net:2170:7)
+    at app.listen (c:\Users\user\Desktop\the_project\simulata\server\node_modules\express\lib\application.js:635:24)
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\index.ts:6:5)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:2044:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v24.15.0
+14:25:39 [tsx] change in ./src\routes\run.routes.ts Rerunning...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:11
+router.get('/stats', getStats); // הוסיפי את הנתיב הזה
+                     ^
+
+ReferenceError: getStats is not defined
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:11:22)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:25:48 [tsx] change in ./src\routes\run.routes.ts Rerunning...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:10
+router.get('/simulations/:simulationId/runs', getRunsBySimulation);
+                                              ^
+
+ReferenceError: getRunsBySimulation is not defined
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:10:47)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:25:50 [tsx] change in ./src\routes\run.routes.ts Rerunning...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:2
+import { getAllRuns, getRunById, getRunsBySimulation, getStats } from '../controllers/run.controller.js';
+                                                      ^
+SyntaxError: The requested module '../controllers/run.controller.js' does not provide an export named 'getStats'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:326:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:429:5)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:27:36 [tsx] change in ./src\controllers\run.controller.ts Rerunning...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:2
+import { getAllRuns, getRunById, getRunsBySimulation, getStats } from '../controllers/run.controller.js';
+                                                      ^
+SyntaxError: The requested module '../controllers/run.controller.js' does not provide an export named 'getStats'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:326:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:429:5)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:27:37 [tsx] change in ./src\controllers\run.controller.ts Rerunning...
+cServer running on http://localhost:3000
+14:28:08 [tsx] change in ./src\controllers\run.controller.ts Restarting...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:2
+import { getAllRuns, getRunById, getRunsBySimulation, getStats } from '../controllers/run.controller.js';
+                                                      ^
+SyntaxError: The requested module '../controllers/run.controller.js' does not provide an export named 'getStats'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:326:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:429:5)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:28:20 [tsx] change in ./src\routes\run.routes.ts Rerunning...
+cc:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:11
+router.get('/stats', getStats); // הוסיפי את הנתיב הזה
+                     ^
+
+ReferenceError: getStats is not defined
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\routes\run.routes.ts:11:22)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+14:28:23 [tsx] change in ./src\routes\run.routes.ts Rerunning...
+cServer running on http://localhost:3000
+14:28:24 [tsx] change in ./src\routes\run.routes.ts Restarting...
+cnode:events:487
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:2008:16)
+    at listenInCluster (node:net:2065:12)
+    at Server.listen (node:net:2170:7)
+    at app.listen (c:\Users\user\Desktop\the_project\simulata\server\node_modules\express\lib\application.js:635:24)
+    at <anonymous> (c:\Users\user\Desktop\the_project\simulata\server\src\index.ts:6:5)
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:2044:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v24.15.0
