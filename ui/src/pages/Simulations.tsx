@@ -1,275 +1,16 @@
-
-
-// import React, { useState, useEffect, useCallback, useRef } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Plus, Play, Trash2, Upload, Activity, Database, Search } from 'lucide-react';
-
-// // אימפורטים מה-API המקורי שלך
-// import { 
-//   listScenarios, 
-//   listProfiles, 
-//   deleteScenario, 
-//   runScenario, 
-//   importYamlSimulation, 
-//   type ScenarioInfo, 
-//   type ProfileInfo 
-// } from "../api/index";
-
-// const Simulations: React.FC = () => {
-//   const navigate = useNavigate();
-//   const yamlInputRef = useRef<HTMLInputElement>(null);
-  
-//   // States מהפרויקט הישן והחדש משולבים
-//   const [simulations, setSimulations] = useState<ScenarioInfo[]>([]);
-//   const [profiles, setProfiles] = useState<ProfileInfo[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [importing, setImporting] = useState(false);
-
-//   // פונקציית טעינה בדיוק כמו בישן
-//   const loadData = useCallback(async () => {
-//     try {
-//       setLoading(true);
-//       const [sims, pros] = await Promise.all([
-//         listScenarios(),
-//         listProfiles()
-//       ]);
-//       setSimulations(sims);
-//       setProfiles(pros);
-//     } catch (error) {
-//       console.error("Failed to fetch data:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }, []);
-
-//   useEffect(() => {
-//     loadData();
-//   }, [loadData]);
-
-//   // לוגיקת ייבוא קובץ מהפרויקט הישן
-//   const handleYamlImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-//     setImporting(true);
-//     try {
-//       const yamlContent = await file.text();
-//       await importYamlSimulation(yamlContent);
-//       alert(`הקובץ "${file.name}" יובא בהצלחה!`);
-//       await loadData(); // רענון רשימה
-//     } catch (err: any) {
-//       alert(`ייבוא נכשל: ${err.message}`);
-//     } finally {
-//       setImporting(false);
-//       if (yamlInputRef.current) yamlInputRef.current.value = "";
-//     }
-//   };
-
-//   const handleDelete = async (id: string) => {
-//     if (window.confirm("האם את בטוחה שברצונך למחוק את הסימולציה?")) {
-//       try {
-//         await deleteScenario(id);
-//         await loadData();
-//       } catch (error) {
-//         alert("שגיאה במחיקת הסימולציה");
-//       }
-//     }
-//   };
-
-//   const handleRun = async (id: string, scenarioName: string) => {
-//     // בדיקה שיש Actions בסימולציה לפני הרצה
-//     const scenario = simulations.find(s => s.id === id || s.simulation_config_id === id);
-    
-//     if (!scenario || !scenario.scenario_config || !scenario.scenario_config.phases) {
-//       alert(`Cannot run "${scenarioName}": No execution plan defined.`);
-//       return;
-//     }
-
-//     // בדיקה שיש לפחות action אחד
-//     const hasActions = scenario.scenario_config.phases.some(
-//       (p: any) => p.actions && p.actions.length > 0
-//     );
-
-//     if (!hasActions) {
-//       alert(`Cannot run "${scenarioName}": No actions configured. Please edit the simulation and add at least one Data Reader or Data Writer.`);
-//       return;
-//     }
-
-//     try {
-//       const result = await runScenario(id);
-//       navigate(`/run/${result.run_id}`);
-//     } catch (error: any) {
-//       alert(`Failed to run simulation: ${error.message}`);
-//     }
-//   };
-
-//   const filteredSims = simulations.filter(s => 
-//     s.name.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
-
-//   if (loading) return <div className="p-8 text-center font-['Heebo']">טוען סימולציות...</div>;
-
-//   return (
-//     <div className="p-6 max-w-7xl mx-auto font-['Heebo']">
-//       {/* Header Section */}
-//       <div className="flex justify-between items-center mb-8">
-//         <div>
-//           <h1 className="text-[32px] font-bold text-slate-800 leading-tight">Simulations</h1>
-//           <p className="text-[16px] font-normal text-slate-500">Managing and running simulation scenarios</p>
-//         </div>
-        
-//         <div className="flex gap-3">
-//           <input 
-//             ref={yamlInputRef}
-//             type="file" 
-//             className="hidden" 
-//             accept=".yaml,.yml"
-//             onChange={handleYamlImport}
-//           />
-          
-//           <button 
-//             onClick={() => yamlInputRef.current?.click()}
-//             disabled={importing}
-//             className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-[16px] font-normal"
-//           >
-//             <Upload size={18} />
-//             {importing ? "Importing..." : "Import YAML"}
-//           </button>
-
-//           <button 
-//             onClick={() => navigate('/new-simulation')}
-//             className="flex items-center gap-2 px-4 py-2 bg-[#0a153f] text-white rounded-lg hover:bg-[#37A8D8] transition-colors text-[16px] font-medium"
-//           >
-//             <Plus size={18} />
-//             New Simulation
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Search Bar */}
-//       <div className="relative mb-6">
-//         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-//         <input 
-//           type="text"
-//           placeholder="Search simulation..."
-//           className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#37A8D8]/20 text-[16px]"
-//           value={searchTerm}
-//           onChange={(e) => setSearchTerm(e.target.value)}
-//         />
-//       </div>
-
-//       {/* Grid של כרטיסי סימולציה */}
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//         {filteredSims.map((s) => {
-//           const profile = profiles.find(p => p.id === s.dds_profile_id);
-          
-//           // בדיקה האם יש לפחות פעולה אחת (Action) מוגדרת בתוך השלבים
-//           const hasActions = s.scenario_config?.phases?.some(
-//             (p: any) => p.actions && p.actions.length > 0
-//           ) || false;
-
-//           return (
-//             <div 
-//               key={s.id} 
-//               // שינוי 1: הפיכת הכרטיס ללחיץ למעבר לעריכה
-//               onClick={() => navigate(`/edit-simulation/${s.simulation_config_id || s.id}`)}
-//               className="bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
-//             >
-//               <div className="flex justify-between items-start mb-4">
-//                 <div className="p-3 bg-[#f0eeff] rounded-xl text-[#5c4cf4]">
-//                   <Activity size={24} />
-//                 </div>
-//                 {/* שינוי 2: הוספת stopPropagation למנוע מעבר דף כשרוצים רק למחוק */}
-//                 <button 
-//                   onClick={(e) => {
-//                     e.stopPropagation(); 
-//                     handleDelete(s.id);
-//                   }} 
-//                   className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
-//                 >
-//                   <Trash2 size={18} />
-//                 </button>
-//               </div>
-
-//               <h3 className="text-[24px] font-medium text-slate-800 mb-1 leading-snug">{s.name}</h3>
-//               <p className="text-[16px] font-normal text-slate-500 mb-4 line-clamp-2">{s.description || 'אין תיאור זמין'}</p>
-
-//               <div className="flex items-center gap-2 mb-6">
-//                 <Database size={16} className="text-[#37A8D8]" />
-//                 <span className="text-[16px] font-medium text-slate-600">Profile:</span>
-//                 <span className="text-[14px] bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-normal">
-//                   {profile?.name || 'System Default'}
-//                 </span>
-//               </div>
-
-//               {/* Phases & Assertions */}
-//               <div className="grid grid-cols-2 gap-4 mb-6 border-y border-slate-50 py-4">
-//                 <div className="text-center">
-//                   <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Phases</p>
-//                   <p className="text-[20px] font-medium text-slate-700">
-//                     {s.scenario_config?.phases?.length || 0}
-//                   </p>
-//                 </div>
-//                 <div className="text-center border-l border-slate-100">
-//                   <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Actions</p>
-//                   <p className="text-[20px] font-medium text-slate-700">
-//                     {s.scenario_config?.phases?.reduce((sum: number, p: any) => sum + (p.actions?.length || 0), 0) || 0}
-//                   </p>
-//                 </div>
-//               </div>
-
-//               {/* שינוי 3: תיקון כפתור ה-Run */}
-//               {/* א. הוספת stopPropagation כדי שהקליק על הרצה לא יפתח בטעות את עריכת הדף */}
-//               {/* ב. שינוי ה-disabled: כעת הכפתור יהיה זמין רק אם יש Actions בסימולציה */}
-//               {!hasActions && (
-//                 <div className="mb-3 text-center text-xs text-amber-600 bg-amber-50 py-2 rounded border border-amber-200">
-//                   ⚠️ No actions configured - Edit to add actions before running
-//                 </div>
-//               )}
-//           <button 
-//             onClick={(e) => {
-//               e.stopPropagation(); 
-//               handleRun(s.simulation_config_id || s.id, s.scenario_name || s.name);
-//             }}
-//             disabled={!hasActions} // מאפשר להריץ רק אם יש Actions מוגדרים
-//             className="w-full flex items-center justify-center gap-2 bg-[#37A8D8] text-white py-3 rounded-lg hover:bg-[#2e8db6] disabled:opacity-50 font-medium text-[16px] transition-colors"
-//             title={!hasActions ? "Add actions to this simulation before running" : "Run this simulation"}
-//           >
-//             <Play size={18} fill="currentColor" />
-//             Run
-//           </button>
-//             </div>
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Simulations;
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Trash2, Upload, Activity, Database, Search } from 'lucide-react';
+import { Plus, Play, Trash2, Pencil, Upload, Activity, Database, Search } from 'lucide-react';
 
-// עדכון האימפורטים לשימוש ב-API החדש
-import { 
-  getAllSimulations, // הפונקציה החדשה
-  listProfiles, 
-  deleteScenario, 
-  runScenario, 
-  importYamlSimulation, 
-  type SimulationConfig, // הטיפוס החדש
-  type ProfileInfo 
-} from "../api/index";
+// שימוש בייבוא מהקבצים החדשים והמסודרים שלנו
+import { getAllSimulations, deleteSimulation, runSimulation, importYamlSimulation } from "../api/simulations";
+import type { SimulationConfig } from "../types/api";
 
 const Simulations: React.FC = () => {
   const navigate = useNavigate();
   const yamlInputRef = useRef<HTMLInputElement>(null);
   
-  // עדכון ה-State לטיפוס החדש
   const [simulations, setSimulations] = useState<SimulationConfig[]>([]);
-  const [profiles, setProfiles] = useState<ProfileInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [importing, setImporting] = useState(false);
@@ -277,12 +18,8 @@ const Simulations: React.FC = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [sims, pros] = await Promise.all([
-        getAllSimulations(), // קריאה לשרת האמיתי
-        listProfiles()
-      ]);
-      setSimulations(sims);
-      setProfiles(pros);
+      const data = await getAllSimulations();
+      setSimulations(data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -299,8 +36,7 @@ const Simulations: React.FC = () => {
     if (!file) return;
     setImporting(true);
     try {
-      const yamlContent = await file.text();
-      await importYamlSimulation(yamlContent);
+      await importYamlSimulation(file);
       alert(`הקובץ "${file.name}" יובא בהצלחה!`);
       await loadData(); 
     } catch (err: any) {
@@ -312,49 +48,47 @@ const Simulations: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("האם את בטוחה שברצונך למחוק את הסימולציה?")) {
+    if (window.confirm("האם אתה בטוח שברצונך למחוק את הסימולציה?")) {
       try {
-        await deleteScenario(id);
-        await loadData();
+        await deleteSimulation(id);
+        setSimulations(prev => prev.filter(s => s.simulation_config_id !== id));
       } catch (error) {
         alert("שגיאה במחיקת הסימולציה");
       }
     }
   };
 
-  const handleRun = async (id: string, scenarioName: string) => {
-    const scenario = simulations.find(s => s.simulation_config_id === id);
-    
-    // בדיקה לפי המבנה החדש (productions במקום scenario_config)
-    if (!scenario || !scenario.productions || scenario.productions.length === 0) {
-      alert(`Cannot run "${scenarioName}": No configurations defined.`);
-      return;
-    }
-
+  const handleRun = async (id: string, name: string) => {
     try {
-      const result = await runScenario(id);
-      navigate(`/run/${result.run_id}`);
+      console.log(`Running simulation with ID: ${id}`);
+      const result = await runSimulation(id);
+      console.log("Run result:", result);
+      if (result.run?.simulation_run_id) {
+        console.log(`Navigating to run ID: ${result.run.simulation_run_id}`);
+        navigate(`/run/${result.run.simulation_run_id}`, { state: { simName: name } });
+      }
     } catch (error: any) {
+      console.error("Error running simulation:", error);
       alert(`Failed to run simulation: ${error.message}`);
     }
   };
 
-  // חיפוש לפי scenario_name
   const filteredSims = simulations.filter(s => 
-    (s.scenario_name || "").toLowerCase().includes(searchTerm.toLowerCase())
+    (s.simulation_name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <div className="p-8 text-center font-['Heebo']">טוען סימולציות...</div>;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto font-['Heebo']">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto font-['Heebo']" dir="ltr">
+      {/* Top Header Row */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-[32px] font-bold text-slate-800 leading-tight">Simulations</h1>
-          <p className="text-[16px] font-normal text-slate-500">Managing and running simulation scenarios</p>
+          <h1 className="text-2xl md:text-[32px] font-bold text-slate-800 leading-tight">Simulations</h1>
+          <p className="text-sm md:text-[16px] font-normal text-slate-500">Managing and running simulation scenarios</p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full sm:w-auto">
           <input 
             ref={yamlInputRef}
             type="file" 
@@ -366,7 +100,7 @@ const Simulations: React.FC = () => {
           <button 
             onClick={() => yamlInputRef.current?.click()}
             disabled={importing}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-[16px] font-normal"
+            className="cursor-pointer flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-xs md:text-sm lg:text-base font-normal bg-white whitespace-nowrap"
           >
             <Upload size={18} />
             {importing ? "Importing..." : "Import YAML"}
@@ -374,7 +108,7 @@ const Simulations: React.FC = () => {
 
           <button 
             onClick={() => navigate('/new-simulation')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0a153f] text-white rounded-lg hover:bg-[#37A8D8] transition-colors text-[16px] font-medium"
+            className="cursor-pointer flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0a153f] text-white rounded-lg hover:bg-[#37A8D8] transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
           >
             <Plus size={18} />
             New Simulation
@@ -382,32 +116,29 @@ const Simulations: React.FC = () => {
         </div>
       </div>
 
+      {/* Search Input */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
         <input 
           type="text"
           placeholder="Search simulation..."
-          className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#37A8D8]/20 text-[16px]"
+          className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#37A8D8]/20 text-sm md:text-[16px]"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
+      {/* Responsive Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSims.map((s) => {
-          // בדיקה אם יש חוזים בתוך ה-productions (המבנה החדש)
-          const hasActions = s.productions?.some(
-            (p: any) => p.contracts && p.contracts.length > 0
-          ) || false;
-
-          return (
-            <div 
-              key={s.simulation_config_id} 
-              onClick={() => navigate(`/edit-simulation/${s.simulation_config_id}`)}
-              className="bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
-            >
+        {filteredSims.map((s) => (
+          <div 
+            key={s.simulation_config_id} 
+            className="bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between min-w-0"
+          >
+            <div>
+              {/* Card Header Actions */}
               <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-[#f0eeff] rounded-xl text-[#5c4cf4]">
+                <div className="p-3 bg-[#f0eeff] rounded-xl text-[#5c4cf4] shrink-0">
                   <Activity size={24} />
                 </div>
                 <button 
@@ -415,63 +146,64 @@ const Simulations: React.FC = () => {
                     e.stopPropagation(); 
                     handleDelete(s.simulation_config_id);
                   }} 
-                  className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
+                  className="cursor-pointer p-2 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
                 >
                   <Trash2 size={18} />
                 </button>
               </div>
 
-              <h3 className="text-[24px] font-medium text-slate-800 mb-1 leading-snug">
-                {s.scenario_name}
+              {/* טקסט השם מתקטן דינמית לפי גודל המסך כדי לא לברוח אף פעם */}
+              <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-slate-800 mb-2 leading-snug break-words">
+                {s.simulation_name}
               </h3>
-              <p className="text-[16px] font-normal text-slate-500 mb-4 line-clamp-2">
-                Created at: {new Date(s.created_at).toLocaleDateString()}
+              
+              {/* טקסט ה-ID מתקטן דינמית ונשבר בצורה מאובטחת בתוך הבלוק שלו */}
+              <p className="text-[10px] sm:text-xs md:text-sm font-normal text-slate-400 mb-4 break-all select-all bg-slate-50 p-2 rounded-xl border border-slate-100">
+                <span className="font-bold block text-slate-500 text-[9px] uppercase tracking-wider mb-0.5">Simulation ID</span>
+                {s.simulation_config_id}
               </p>
 
-              <div className="flex items-center gap-2 mb-6">
-                <Database size={16} className="text-[#37A8D8]" />
-                <span className="text-[16px] font-medium text-slate-600">ID:</span>
-                <span className="text-[14px] bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-normal truncate max-w-[150px]">
-                  {s.simulation_config_id}
-                </span>
+              {/* Status Badge */}
+              <div className="flex items-center gap-2 mb-6 border-t border-slate-50 pt-4">
+                <Database size={16} className="text-[#37A8D8] shrink-0" />
+                <span className="text-xs sm:text-sm text-slate-600">Configuration active</span>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-6 border-y border-slate-50 py-4">
-                <div className="text-center">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Productions</p>
-                  <p className="text-[20px] font-medium text-slate-700">
-                    {s.productions?.length || 0}
-                  </p>
-                </div>
-                <div className="text-center border-l border-slate-100">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Total Contracts</p>
-                  <p className="text-[20px] font-medium text-slate-700">
-                    {s.productions?.reduce((sum: number, p: any) => sum + (p.contracts?.length || 0), 0) || 0}
-                  </p>
-                </div>
-              </div>
-
-              {!hasActions && (
-                <div className="mb-3 text-center text-xs text-amber-600 bg-amber-50 py-2 rounded border border-amber-200">
-                  ⚠️ No contracts configured
-                </div>
-              )}
-
+            {/* Bottom Controls */}
+            <div className="flex gap-2 mt-auto">
               <button 
-                onClick={(e) => {
+                onClick={(e) => { 
                   e.stopPropagation(); 
-                  handleRun(s.simulation_config_id, s.scenario_name);
+                  navigate(`/new-simulation/${s.simulation_config_id}`); 
                 }}
-                disabled={!hasActions}
-                className="w-full flex items-center justify-center gap-2 bg-[#37A8D8] text-white py-3 rounded-lg hover:bg-[#2e8db6] disabled:opacity-50 font-medium text-[16px] transition-colors"
+                className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 bg-white border border-slate-200 text-slate-700 py-2.5 rounded-lg hover:bg-slate-50 hover:border-slate-300 font-medium text-xs sm:text-sm md:text-base transition-colors"
               >
-                <Play size={18} fill="currentColor" />
+                <Pencil size={15} />
+                Edit
+              </button>
+              
+              <button 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  handleRun(s.simulation_config_id, s.simulation_name); 
+                }}
+                className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 bg-[#37A8D8] text-white py-2.5 rounded-lg hover:bg-[#2e8db6] font-medium text-xs sm:text-sm md:text-base transition-colors"
+              >
+                <Play size={15} fill="currentColor" />
                 Run
               </button>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
+
+      {/* Empty State */}
+      {filteredSims.length === 0 && (
+        <div className="text-center py-12 text-slate-400 font-medium text-sm uppercase tracking-wider">
+          No matching simulations found
+        </div>
+      )}
     </div>
   );
 };

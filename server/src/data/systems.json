@@ -1,0 +1,22 @@
+[
+  {
+    "system_id": "sys-1",
+    "name": "Radar_System_Alpha"
+  },
+  {
+    "system_id": "sys-2",
+    "name": "Command_Control_Center"
+  },
+  { 
+    "system_id": "sys-3",
+    "name": "Weapon_Launcher_Bay"
+  },
+  {
+    "system_id": "sys-4",
+    "name": "Drone_Swarm_Controller"
+  },
+  {
+    "system_id": "sys-5",
+    "name": "Intelligence_Database"
+  }
+]

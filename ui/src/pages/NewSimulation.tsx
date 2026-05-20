@@ -1,803 +1,566 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  ChevronLeft, Save, Settings, ArrowLeftRight,
-  Plus, Monitor, Trash2, Book, Radio, Database,
+  ChevronLeft, Save, ArrowLeftRight,
+  Monitor, Radio, Database,
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
-import { 
-  createSimulation, 
-  getAllSimulations 
-} from '../api/index';
-import { listSystems, listDictionaries } from '../api/index';
-import type { SystemInfo, Dictionary } from '../api/index';
 
-// ─── Local-only types (UI state, never sent to server) ────────────────────────
+// API Imports
+import { createSimulation, updateSimulation, getSimulationById, getAllSimulations } from '../api/simulations';
+import { getAllSystems } from '../api/systems';
+import { getAllContracts, getContractEntities } from '../api/contracts';
+import { getAbcVersionsByContract } from '../api/abcVersions'; 
 
-interface SystemInterface {
-  id: string;
-  type: 'Writer' | 'Reader';
-  messageCount: number;
-  frequencyHz: number;
-}
+// Type Imports
+import type { System, Contract, DataEntity, AbcVersion } from '../types/api';
 
 interface ActiveSystem {
-  id: string;
+  id: string; 
   selectedSystemId: string;
-  selectedDictId: string;
-  interfaces: SystemInterface[];
+  selectedContractId: string;      
+  selectedAbcVersion: string;      
+  availableAbcVersions: AbcVersion[]; 
+  entities: DataEntity[];
 }
 
-const DEFAULT_SYSTEMS: ActiveSystem[] = [
-  { id: '1', selectedSystemId: '', selectedDictId: '', interfaces: [] },
-  { id: '2', selectedSystemId: '', selectedDictId: '', interfaces: [] },
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
+// פונקציית עזר שמנקה שמות מערכות מהסיומת כדי להשאיר רק את ה-Suffix האמיתי
+const cleanSuffixOfSystemNames = (suffixText: string, systemsList: any[]) => {
+  let cleaned = suffixText;
+  systemsList.forEach(sys => {
+    if (!sys.name) return;
+    // מנקה פורמטים כמו (System_Name) או System_Name
+    const regexWithBrackets = new RegExp(`\\(${sys.name}\\)`, 'gi');
+    const regexPlain = new RegExp(sys.name, 'gi');
+    cleaned = cleaned.replace(regexWithBrackets, '').replace(regexPlain, '');
+  });
+  // מנקה מקפים, סוגריים ורווחים כפולים שנשארו כתוצאה מההחלפה
+  return cleaned.replace(/[\(\)\-\s]+/g, ' ').trim();
+};
 
 const NewSimulation = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const isEditMode = !!id;
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams();
 
-  // --- Server-bound state ---
-  const [scenarioName, setScenarioName] = useState('');
+  const isEditMode = !!id;
+  const simulationId = id;
+
+  const [generatedBaseName, setGeneratedBaseName] = useState('');
+  const [customSuffix, setCustomSuffix] = useState('');
+  
   const [latency, setLatency] = useState(0);
   const [jitter, setJitter] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [assertions, setAssertions] = useState({
-    deliveryComplete: false,
-    noErrors: false,
-    allMatched: false,
-  });
+  
+  const [availableSystems, setAvailableSystems] = useState<System[]>([]);
+  const [allContracts, setAllContracts] = useState<Contract[]>([]);
+  
+  const [activeSystems, setActiveSystems] = useState<ActiveSystem[]>([
+    { id: '1', selectedSystemId: '', selectedContractId: '', selectedAbcVersion: '', availableAbcVersions: [], entities: [] },
+    { id: '2', selectedSystemId: '', selectedContractId: '', selectedAbcVersion: '', availableAbcVersions: [], entities: [] },
+  ]);
 
-  // --- Local UI-only state ---
-  const [activeSystems, setActiveSystems] = useState<ActiveSystem[]>(DEFAULT_SYSTEMS);
-  const [availableSystems, setAvailableSystems] = useState<SystemInfo[]>([]);
-  const [allDictionaries, setAllDictionaries] = useState<Dictionary[]>([]);
-
-  // ─── Load data ──────────────────────────────────────────────────────────────
-
+  // הטעינה הראשונית עם תיקון המיזוג לעריכה והפרדת השם
   useEffect(() => {
-    const load = async () => {
+    const loadInitialData = async () => {
       try {
-        const [systems, dicts, scenarios] = await Promise.all([
-          listSystems(),
-          listDictionaries(),
-          getAllSimulations(),
+        const [systems, contracts] = await Promise.all([
+          getAllSystems(),
+          getAllContracts(),
         ]);
-        setAvailableSystems(systems);
-        setAllDictionaries(dicts);
+        setAvailableSystems(systems || []);
+        setAllContracts(contracts || []);
 
-        if (!isEditMode) return;
-        const scenario = scenarios.find(
-          (s) => String(s.simulation_config_id ).trim() === String(id).trim()
-        );
-        if (!scenario) return;
+        // טעינה במצב עריכה
+        if (isEditMode && simulationId) {
+          const editSimulation = await getSimulationById(simulationId);
+          const fullName = editSimulation.simulation_name || '';
+          
+          const config = editSimulation.configuration_details as any;
+          if (config) {
+            setLatency(config.latency_ms ?? 0);
+            setJitter(config.jitter_ms ?? 0);
 
-        setScenarioName(scenario.scenario_name || '');
-const config = scenario as any;
-        if (!config) return;
-        setLatency(config.transport_latency_ms || 0);
-        setJitter(config.transport_jitter_ms || 0);
-        if (config.assertions) {
-          const types = config.assertions.map((a: any) => a.type);
-          setAssertions({
-            deliveryComplete: types.includes('delivery_complete'),
-            noErrors: types.includes('no_errors'),
-            allMatched: types.includes('all_matched'),
-          });
+            const savedSystemsArray = config.systems || [];
+            const populatedSystems = await Promise.all(
+              savedSystemsArray.map(async (savedSys: any, index: number) => {
+                const cId = savedSys.contract_config_id;
+                let fetchedEntities: DataEntity[] = [];
+                let fetchedAbcVersions: AbcVersion[] = [];
+
+                if (cId) {
+                  try {
+                    const [entitiesRes, abcRes] = await Promise.all([
+                      getContractEntities(cId).catch(() => []),
+                      getAbcVersionsByContract(cId).catch(() => [])
+                    ]);
+                    fetchedEntities = entitiesRes;
+                    fetchedAbcVersions = abcRes;
+                  } catch (e) {
+                    console.error("Error loading sub-resources in edit mode", e);
+                  }
+                }
+
+                // מיזוג הערכים השמורים לתוך הרכיבים שנטענו
+                const mergedEntities = fetchedEntities.map((entity: any) => {
+                  const currentEntityId = entity.entity_id || entity.data_writer_id || entity.data_reader_id;
+                  
+                  const savedEntity = (savedSys.entities || []).find((se: any) => 
+                    (se.entity_id === currentEntityId || se.data_writer_id === currentEntityId || se.data_reader_id === currentEntityId)
+                  );
+
+                  if (savedEntity) {
+                    return {
+                      ...entity,
+                      message_count: savedEntity.message_count ?? entity.message_count,
+                      message_frequency_hz: savedEntity.message_frequency_hz ?? entity.message_frequency_hz
+                    };
+                  }
+                  return entity;
+                });
+
+                return {
+                  id: String(index + 1),
+                  selectedSystemId: savedSys.system_id || '',
+                  selectedContractId: cId || '',
+                  selectedAbcVersion: savedSys.abc_version_id || '',
+                  availableAbcVersions: fetchedAbcVersions,
+                  entities: mergedEntities
+                };
+              })
+            );
+
+            setActiveSystems([
+              populatedSystems[0] || { id: '1', selectedSystemId: '', selectedContractId: '', selectedAbcVersion: '', availableAbcVersions: [], entities: [] },
+              populatedSystems[1] || { id: '2', selectedSystemId: '', selectedContractId: '', selectedAbcVersion: '', availableAbcVersions: [], entities: [] }
+            ]);
+
+            // שחזור והפרדה חכמה של השם האוטומטי והסיומת
+            const name1 = systems.find(s => s.system_id === populatedSystems[0]?.selectedSystemId)?.name || '';
+            const name2 = systems.find(s => s.system_id === populatedSystems[1]?.selectedSystemId)?.name || '';
+            
+            if (name1 || name2) {
+              const base = `(${name1 || '?'})-(${name2 || '?'})`;
+              setGeneratedBaseName(base);
+              
+              // if (fullName.startsWith(base)) {
+              //   setCustomSuffix(fullName.replace(base, ''));
+              // } else {
+              //   setCustomSuffix(fullName);
+              // }
+              if (fullName.startsWith(base)) {
+  setCustomSuffix(fullName.replace(base, '').trim());
+} else {
+  // 🔥 שימוש בפונקציית הניקוי החדשה גם בטעינה הראשונית של עריכה
+  setCustomSuffix(cleanSuffixOfSystemNames(fullName, systems));
+}
+            } else {
+              setCustomSuffix(fullName);
+            }
+          }
         }
-      } catch {
-        toast('Failed to load scenario data', 'error');
+      } catch (err) {
+        console.error(err);
+        toast('Failed to load initial data', 'error');
       }
     };
-    load();
-  }, [id, isEditMode, toast]);
 
-  // ─── Local UI handlers (topology - never touches server) ────────────────────
+    loadInitialData();
+  }, [simulationId, isEditMode]);
 
-  const scrollToEnd = () =>
-    setTimeout(() => scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' }), 100);
 
-  const addSystem = () => {
-    setActiveSystems((prev) => [...prev, { id: Date.now().toString(), selectedSystemId: '', selectedDictId: '', interfaces: [] }]);
-    scrollToEnd();
-  };
 
-  const removeSystem = (boxId: string) => {
-    if (activeSystems.length > 2) setActiveSystems((prev) => prev.filter((s) => s.id !== boxId));
-  };
+  const updateSystem = (boxId: string, systemId: string) => {
+  setActiveSystems(prev => {
+    const updatedSystems = prev.map(s => 
+      s.id === boxId ? { 
+        ...s, 
+        selectedSystemId: systemId, 
+        selectedContractId: '', 
+        selectedAbcVersion: '', 
+        availableAbcVersions: [], 
+        entities: [] 
+      } : s
+    );
 
-  const updateSystem = (boxId: string, systemId: string) =>
-    setActiveSystems((prev) => prev.map((s) => s.id === boxId ? { ...s, selectedSystemId: systemId, selectedDictId: '', interfaces: [] } : s));
+    const sys1Obj = updatedSystems.find(s => s.id === '1');
+    const sys2Obj = updatedSystems.find(s => s.id === '2');
 
-  const updateDict = (boxId: string, dictId: string) =>
-    setActiveSystems((prev) => prev.map((s) => s.id === boxId ? { ...s, selectedDictId: dictId, interfaces: [] } : s));
+    const name1 = availableSystems.find(s => s.system_id === sys1Obj?.selectedSystemId)?.name || '';
+    const name2 = availableSystems.find(s => s.system_id === sys2Obj?.selectedSystemId)?.name || '';
 
-  const addInterface = (boxId: string, type: 'Writer' | 'Reader') =>
-    setActiveSystems((prev) => prev.map((s) =>
-      s.id === boxId
-        ? { ...s, interfaces: [...s.interfaces, { id: `int-${Date.now()}`, type, messageCount: 100, frequencyHz: 10 }] }
-        : s
-    ));
+    if (name1 || name2) {
+      setGeneratedBaseName(`(${name1 || '?'})-(${name2 || '?'})`);
+    } else {
+      setGeneratedBaseName('');
+    }
 
-  const updateInterface = (boxId: string, intId: string, field: keyof SystemInterface, value: any) =>
-    setActiveSystems((prev) => prev.map((s) =>
-      s.id === boxId
-        ? { ...s, interfaces: s.interfaces.map((i) => i.id === intId ? { ...i, [field]: value } : i) }
-        : s
-    ));
+    // 🔥 התיקון המרכזי: ניקוי מיידי של האינפוט משמות המערכות הקודמות שהיו תקועים בו
+    setCustomSuffix(prevSuffix => cleanSuffixOfSystemNames(prevSuffix, availableSystems));
 
-  const removeInterface = (boxId: string, intId: string) =>
-    setActiveSystems((prev) => prev.map((s) =>
-      s.id === boxId ? { ...s, interfaces: s.interfaces.filter((i) => i.id !== intId) } : s
-    ));
+    return updatedSystems;
+  });
+};
 
-  // ─── Save - builds full hierarchy matching server models ──────────────────
-
-  const handleSave = async () => {
-    if (!scenarioName.trim()) {
-      toast('Please enter a simulation name', 'error');
+  const handleContractChange = async (boxId: string, contractId: string) => {
+    if (!contractId) {
+      setActiveSystems(prev => prev.map(s => 
+        s.id === boxId ? { ...s, selectedContractId: '', selectedAbcVersion: '', availableAbcVersions: [], entities: [] } : s
+      ));
       return;
     }
-    setSaving(true);
+
+    setActiveSystems(prev => prev.map(s => 
+      s.id === boxId ? { ...s, selectedContractId: contractId, entities: [], availableAbcVersions: [] } : s
+    ));
+
     try {
-      const payload = {
-        simulation_config_id: id,
-        scenario_name: scenarioName,
-        productions: activeSystems
-          .filter((sys) => sys.interfaces.length > 0)
-          .map((sys) => ({
-            contracts: sys.interfaces.map((iface) => ({
-              version: '1.0.0',
-              ...(iface.type === 'Writer'
-                ? { dataWriter: { message_count: iface.messageCount, message_frequency_hz: iface.frequencyHz } }
-                : { dataReader: { message_count: iface.messageCount, message_frequency_hz: iface.frequencyHz } }
-              ),
-            })),
-          })),
-      };
+      const [entitiesList, abcVersionsList] = await Promise.all([
+        getContractEntities(contractId), 
+        getAbcVersionsByContract(contractId).catch(() => [])
+      ]);
 
-      console.log("🚀 Sending Payload to Server:", JSON.stringify(payload, null, 2));
+      setActiveSystems(prev => prev.map(s => 
+        s.id === boxId ? { 
+          ...s, 
+          selectedContractId: contractId,
+          entities: entitiesList || [], 
+          availableAbcVersions: abcVersionsList || []
+        } : s
+      ));
 
-      await createSimulation(payload as any);
-      toast(isEditMode ? 'Updated successfully!' : 'Saved successfully!', 'success');
-      navigate('/simulations');
-    } catch {
-      toast('Failed to save', 'error');
-    } finally {
-      setSaving(false);
+    } catch (err) {
+      console.error("Error in handleContractChange:", err);
+      toast('Error loading components from database', 'error');
     }
   };
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  const handleAbcVersionChange = (boxId: string, abcVersionId: string) => {
+    setActiveSystems(prev => prev.map(s => s.id === boxId ? { ...s, selectedAbcVersion: abcVersionId } : s));
+  };
+
+  const handleEntityParamChange = (boxId: string, entityIndex: number, field: 'message_count' | 'message_frequency_hz', value: number) => {
+    setActiveSystems(prev => prev.map(sys => {
+      if (sys.id !== boxId) return sys;
+      const updatedEntities = [...sys.entities];
+      updatedEntities[entityIndex] = {
+        ...updatedEntities[entityIndex],
+        [field]: value
+      };
+      return { ...sys, entities: updatedEntities };
+    }));
+  };
+
+
+  const handleSave = async () => {
+  // 1. יצירת השם הסופי בצורה מפורשת ומדויקת על בסיס הסטייט העדכני ביותר
+  const finalScenarioName = `${generatedBaseName}${customSuffix}`.trim();
+
+  // בדיקות תקינות
+  if (!finalScenarioName || generatedBaseName === '(?)-(?)') {
+    return toast('Simulation Name is required. Please select systems.', 'error');
+  }
+
+  const sys1 = activeSystems.find(s => s.id === '1');
+  const sys2 = activeSystems.find(s => s.id === '2');
+  if (sys1 && sys2 && sys1.selectedSystemId && sys1.selectedSystemId === sys2.selectedSystemId) {
+    return toast('System 1 and System 2 cannot be the same system', 'error');
+  }
+
+  for (let i = 0; i < activeSystems.length; i++) {
+    const sys = activeSystems[i];
+    const systemNameLabel = `System ${i + 1}`;
+
+    if (!sys.selectedSystemId) {
+      return toast(`Please select a configuration for ${systemNameLabel}`, 'error');
+    }
+    if (!sys.selectedContractId) {
+      return toast(`Please select a Dictionary for ${systemNameLabel}`, 'error');
+    }
+    if (!sys.selectedAbcVersion) {
+      return toast(`Please select an ABC Protocol Version for ${systemNameLabel}`, 'error');
+    }
+    if (!sys.entities || sys.entities.length === 0) {
+      return toast(`No entities found for ${systemNameLabel}. Cannot save an empty topology`, 'error');
+    }
+
+    for (let j = 0; j < sys.entities.length; j++) {
+      const entity = sys.entities[j];
+      const entityName = entity.name || `Entity #${j + 1}`;
+
+      if (entity.message_count === undefined || entity.message_count === null || entity.message_count <= 0) {
+        return toast(`MSG Count for "${entityName}" in ${systemNameLabel} must be greater than 0`, 'error');
+      }
+      if (entity.message_frequency_hz === undefined || entity.message_frequency_hz === null || entity.message_frequency_hz <= 0) {
+        return toast(`Freq (Hz) for "${entityName}" in ${systemNameLabel} must be greater than 0`, 'error');
+      }
+    }
+  }
+
+  setSaving(true);
+
+  try {
+    // בדיקה האם השם החדש כבר קיים (רק אם זה לא ה-ID הנוכחי שאנחנו עורכים)
+    const allSimulations = await getAllSimulations();
+    const nameExists = allSimulations.some((sim: any) => 
+      sim.simulation_name?.toLowerCase() === finalScenarioName.toLowerCase() && sim.simulation_config_id !== simulationId
+    );
+
+    if (nameExists) {
+      setSaving(false);
+      return toast(`The simulation name "${finalScenarioName}" already exists. Please choose a different suffix.`, 'error');
+    }
+
+    // 2. בניית ה-Payload - שימי לב שערך ה-simulation_name מקבל בדיוק את finalScenarioName שחישבנו למעלה!
+    const payload = {
+      simulation_name: finalScenarioName, // השם החדש (למשל עם ה-B במקום ה-A)
+      configuration_details: {
+        latency_ms: latency,
+        jitter_ms: jitter,
+        systems: activeSystems.map(s => ({
+          system_id: s.selectedSystemId,
+          contract_config_id: s.selectedContractId,
+          abc_version_id: s.selectedAbcVersion,
+          entities: s.entities.map(e => ({
+            entity_id: e.entity_id || e.data_writer_id || e.data_reader_id,
+            name: e.name,
+            type: e.type || (e.data_writer_id ? 'writer' : 'reader'),
+            message_count: e.message_count ?? 0,
+            message_frequency_hz: e.message_frequency_hz ?? 0
+          }))
+        }))
+      }
+    };
+
+    // 3. שליחה לשרת ומעבר עמוד מיידי כדי לרענן את הנתונים
+    if (isEditMode && simulationId) {
+      await updateSimulation(simulationId, payload as any);
+      toast('Simulation updated successfully!', 'success');
+    } else {
+      await createSimulation(payload as any);
+      toast('Simulation created successfully!', 'success');
+    }
+    
+    // ניווט חזרה לעמוד הסימולציות - שם הנתונים ייטענו מחדש מהשרת עם השם המעודכן
+    navigate('/simulations');
+  } catch (err) {
+    console.error("Error saving simulation:", err);
+    toast('Failed to save simulation', 'error');
+  } finally {
+    setSaving(false);
+  }
+};
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-8 font-heebo" dir="ltr">
-
-      {/* Header */}
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-heebo" dir="ltr">
+      {/* Top Bar */}
+      <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-4 border-b">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-slate-600 transition-colors">
             <ChevronLeft size={24} />
           </button>
-          <h1 className="text-xl font-bold text-navy-950 uppercase tracking-tight">
-            {isEditMode ? 'Edit Simulation' : 'New Simulation'}
+          <h1 className="text-lg md:text-xl font-bold text-navy-950 uppercase tracking-wide">
+            {isEditMode ? 'EDIT SIMULATION' : 'NEW SIMULATION'}
           </h1>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-[#141e52] text-white px-8 py-2.5 rounded-[6px] font-bold text-[12px] hover:bg-navy-900 flex items-center gap-2 shadow-lg transition-all disabled:opacity-50"
+        <button 
+          onClick={handleSave} 
+          disabled={saving} 
+          className="w-full sm:w-auto bg-[#141e52] hover:bg-[#1e2b6e] text-white px-8 py-2.5 rounded-[6px] font-bold text-[12px] flex items-center justify-center gap-2 shadow-lg transition-colors disabled:opacity-50"
         >
-          <Save size={16} /> {saving ? 'SAVING...' : 'SAVE SIMULATION'}
+          <Save size={16} /> {saving ? 'SAVING...' : isEditMode ? 'UPDATE SIMULATION' : 'SAVE SIMULATION'}
         </button>
       </div>
 
-      <main className="max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
-        <div className="col-span-9 space-y-8">
-
-          {/* Scenario Context */}
-          <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-6 text-slate-400">
-              <Settings size={14} />
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em]">Scenario Context</h2>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[12px] font-bold text-navy-950">Simulation Name</label>
-              <input
-                className={`w-full px-4 py-3 border rounded-[6px] outline-none transition-all text-sm ${
-                  isEditMode ? 'bg-slate-100 cursor-not-allowed text-slate-500' : 'bg-slate-50 border-slate-200 focus:border-navy-950'
-                }`}
-                value={scenarioName}
-                onChange={(e) => !isEditMode && setScenarioName(e.target.value)}
-                readOnly={isEditMode}
-                placeholder="Enter simulation name..."
+      {/* Grid Content */}
+      <main className="max-w-[1400px] mx-auto grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+        
+        {/* Left side */}
+        <div className="lg:col-span-9 space-y-6">
+          
+          {/* Simulation Name Section with Suffix input */}
+          <section className="bg-white rounded-[8px] border p-5 shadow-sm">
+            <label className="text-[12px] font-bold text-navy-950 block mb-2">Simulation Name</label>
+            <div className="flex items-center border border-slate-200 rounded-[6px] overflow-hidden bg-white focus-within:border-navy-950 transition-all">
+              
+              {/* החלק הקבוע (האוטומטי) */}
+              {generatedBaseName && (
+                <span className="bg-slate-100 text-slate-600 font-mono px-3 py-3 border-r border-slate-200 text-sm font-bold select-none">
+                  {generatedBaseName}
+                </span>
+              )}
+              
+              {/* החלק הניתן לעריכה ידנית */}
+              <input 
+                type="text"
+                className="w-full px-4 py-3 outline-none text-slate-800 font-semibold text-sm"
+                value={customSuffix}
+                onChange={(e) => setCustomSuffix(e.target.value)}
+                placeholder={generatedBaseName ? "Add custom suffix (e.g. _v1, _run2)..." : "Select systems to generate base name..."}
               />
             </div>
           </section>
 
-          {/* Network Topology - local UI only */}
+          {/* Topology Section */}
           <section className="bg-white rounded-[8px] border shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b bg-slate-50/50 flex items-center justify-between">
-              <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Network Topology</h2>
-              <button onClick={addSystem} className="flex items-center gap-2 text-[10px] font-black text-navy-600 hover:text-navy-950 transition-colors">
-                <Plus size={14} /> ADD SYSTEM
-              </button>
+            <div className="px-6 py-4 border-b bg-slate-50/50">
+              <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Network Topology</h2>
             </div>
 
-            <div ref={scrollRef} className="p-8 overflow-x-auto scroll-smooth">
-              <div className="flex items-start gap-12 min-w-max pb-4">
-                {activeSystems.map((sys, index) => {
-                  const filteredDicts = allDictionaries.filter((d) => d.systemId === sys.selectedSystemId);
-                  return (
-                    <div key={sys.id} className="flex items-start gap-12">
-                      <div className="w-[320px] group flex-shrink-0">
-                        {/* System header */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <div className="bg-navy-900 p-1.5 rounded text-white"><Monitor size={14} /></div>
-                            <span className="text-[11px] font-black text-navy-900 uppercase">System {index + 1}</span>
-                          </div>
-                          {activeSystems.length > 2 && (
-                            <button onClick={() => removeSystem(sys.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                              <Trash2 size={14} />
-                            </button>
+            <div className="p-4 md:p-8 flex flex-col xl:flex-row items-center justify-center gap-6 xl:gap-8">
+              {activeSystems.map((sys, idx) => {
+                const systemContracts = allContracts.filter(c => c.system_id === sys.selectedSystemId);
+
+                return (
+                  <div key={sys.id} className="w-full xl:w-auto flex flex-col xl:flex-row items-center gap-6 xl:gap-8">
+                    
+                    <div className="w-full md:max-w-md xl:w-[360px] bg-white border border-slate-200 p-5 rounded-xl shadow-sm space-y-4">
+                      <div className="flex items-center gap-2 text-navy-900 font-black text-[11px] uppercase">
+                        <Monitor size={14} /> System {idx + 1} *
+                      </div>
+
+                      {/* Dropdown 1: Systems */}
+                      <select
+                        value={sys.selectedSystemId}
+                        onChange={(e) => updateSystem(sys.id, e.target.value)}
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg font-bold text-xs outline-none focus:border-navy-950 transition-colors"
+                      >
+                        <option value="">-- Choose System * --</option>
+                        {availableSystems.map(s => (
+                          <option key={s.system_id} value={s.system_id}>{s.name}</option>
+                        ))}
+                      </select>
+
+                      {sys.selectedSystemId && (
+                        <div className="pt-4 border-t space-y-4">
+                          
+                          {/* Dropdown 2: Dictionaries */}
+                          <label className="text-[10px] font-black text-blue-500 uppercase block">1. Select Dictionary *</label>
+                          <select
+                            value={sys.selectedContractId}
+                            onChange={(e) => handleContractChange(sys.id, e.target.value)}
+                            className="w-full p-3 bg-white border border-blue-100 rounded-lg font-bold text-xs outline-none focus:border-blue-500 transition-colors"
+                          >
+                            <option value="">-- Select Dictionary * --</option>
+                            {systemContracts.map(c => (
+                              <option key={c.contract_config_id} value={c.contract_config_id}>
+                                {c.name} {c.version ? `(v${c.version})` : ''}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* Dropdown 3: ABC protocol */}
+                          {sys.selectedContractId && (
+                            <>
+                              <label className="text-[10px] font-black text-purple-600 uppercase block">2. ABC Protocol Version *</label>
+                              <select
+                                value={sys.selectedAbcVersion}
+                                onChange={(e) => handleAbcVersionChange(sys.id, e.target.value)}
+                                className="w-full p-3 bg-white border border-purple-100 rounded-lg font-bold text-xs outline-none focus:border-purple-500 transition-colors"
+                              >
+                                <option value="">-- Select ABC Version * --</option>
+                                {sys.availableAbcVersions.map(v => (
+                                  <option key={v.abc_version_id} value={v.abc_version_id}>
+                                    {v.abc_version_name || 'Unknown Version'}
+                                  </option>
+                                ))}
+                              </select>
+                            </>
                           )}
-                        </div>
 
-                        {/* System card */}
-                        <div className="bg-slate-50 border border-slate-200 rounded-[8px] p-5 shadow-sm space-y-4">
-                          <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Select System</label>
-                            <select
-                              value={sys.selectedSystemId}
-                              onChange={(e) => updateSystem(sys.id, e.target.value)}
-                              className="w-full p-2.5 bg-white border border-slate-200 rounded font-bold text-xs outline-none"
-                            >
-                              <option value="">-- Choose System --</option>
-                              {availableSystems.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                            </select>
-                          </div>
-
-                          <div className="pt-4 border-t border-slate-200">
-                            {!sys.selectedSystemId ? (
-                              <div className="py-4 text-center">
-                                <p className="text-[10px] font-bold text-red-500 mb-2 animate-pulse">! SELECT SYSTEM FIRST</p>
-                                <div className="py-3 border-2 border-dashed border-slate-200 rounded text-slate-300 flex items-center justify-center gap-2">
-                                  <Book size={14} /><span className="text-[10px] font-black uppercase">Locked</span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="space-y-4">
-                                <div>
-                                  <label className="text-[10px] font-black text-blue-500 uppercase block mb-1">Available Dictionaries</label>
-                                  <select
-                                    value={sys.selectedDictId}
-                                    onChange={(e) => updateDict(sys.id, e.target.value)}
-                                    className="w-full p-2.5 bg-white border border-blue-200 rounded font-bold text-xs outline-none mb-3"
-                                  >
-                                    <option value="">-- Select Dictionary --</option>
-                                    {filteredDicts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-                                  </select>
-                                </div>
-
-                                {sys.selectedDictId && (
-                                  <div className="space-y-3 pt-2">
-                                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-tighter">Active Interfaces</label>
-                                    {sys.interfaces.map((int) => (
-                                      <div key={int.id} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm group/int">
-                                        <div className="flex items-center justify-between mb-3">
-                                          <div className="flex items-center gap-2">
-                                            {int.type === 'Writer'
-                                              ? <Radio size={14} className="text-orange-500" />
-                                              : <Database size={14} className="text-emerald-500" />}
-                                            <span className="text-[10px] font-black uppercase text-slate-700">{int.type}</span>
-                                          </div>
-                                          <button onClick={() => removeInterface(sys.id, int.id)} className="text-slate-300 hover:text-red-500 transition-colors">
-                                            <Trash2 size={12} />
-                                          </button>
+                          {/* Entity List View */}
+                          {sys.selectedContractId && (
+                            <div className="pt-4 border-t mt-2">
+                              <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">Entities *</label>
+                              
+                              {sys.entities && sys.entities.length > 0 ? (
+                                <div className="space-y-3 max-h-[250px] overflow-y-auto pr-1">
+                                  {sys.entities.map((entity, eIdx) => {
+                                    const isWriter = entity.type === 'writer' || !!entity.data_writer_id;
+                                    
+                                    return (
+                                      <div key={eIdx} className="bg-slate-50 border border-slate-100 p-3 rounded-lg flex flex-col gap-3">
+                                        <div className="flex items-center gap-2">
+                                          {isWriter ? (
+                                            <Radio size={14} className="text-orange-500" />
+                                          ) : (
+                                            <Database size={14} className="text-emerald-500" />
+                                          )}
+                                          <span className="text-[10px] font-black uppercase text-navy-900 truncate">
+                                            {entity.name || 'Unnamed'}
+                                          </span>
+                                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 ml-auto uppercase">
+                                            {isWriter ? 'Writer' : 'Reader'}
+                                          </span>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3">
+                                        
+                                        <div className="grid grid-cols-2 gap-2 border-t pt-2">
                                           <div className="space-y-1">
-                                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Messages</label>
-                                            <input
-                                              type="number"
-                                              className="w-full border border-slate-200 rounded p-1.5 text-[10px] font-bold outline-none"
-                                              value={int.messageCount}
-                                              onChange={(e) => updateInterface(sys.id, int.id, 'messageCount', Number(e.target.value))}
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase block">MSG Count *</label>
+                                            <input 
+                                              type="number" 
+                                              min="1"
+                                              className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-700 outline-none focus:border-navy-950"
+                                              value={entity.message_count ?? ''}
+                                              onChange={(e) => handleEntityParamChange(sys.id, eIdx, 'message_count', Number(e.target.value))}
                                             />
                                           </div>
                                           <div className="space-y-1">
-                                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Freq (Hz)</label>
-                                            <input
-                                              type="number"
-                                              className="w-full border border-slate-200 rounded p-1.5 text-[10px] font-bold outline-none"
-                                              value={int.frequencyHz}
-                                              onChange={(e) => updateInterface(sys.id, int.id, 'frequencyHz', Number(e.target.value))}
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase block">Freq (Hz) *</label>
+                                            <input 
+                                              type="number" 
+                                              min="1"
+                                              className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-700 outline-none focus:border-navy-950"
+                                              value={entity.message_frequency_hz ?? ''}
+                                              onChange={(e) => handleEntityParamChange(sys.id, eIdx, 'message_frequency_hz', Number(e.target.value))}
                                             />
                                           </div>
                                         </div>
                                       </div>
-                                    ))}
-                                    <div className="flex gap-2 pt-2">
-                                      <button onClick={() => addInterface(sys.id, 'Writer')} className="flex-1 py-2 border border-dashed border-orange-200 rounded text-[9px] font-black text-orange-600 flex items-center justify-center gap-1">
-                                        <Plus size={12} /> WRITER
-                                      </button>
-                                      <button onClick={() => addInterface(sys.id, 'Reader')} className="flex-1 py-2 border border-dashed border-emerald-200 rounded text-[9px] font-black text-emerald-600 flex items-center justify-center gap-1">
-                                        <Plus size={12} /> READER
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <div className="text-[11px] text-slate-400 italic text-center py-4 bg-slate-50/50 rounded-lg border border-dashed">
+                                  No components found or loading...
+                                </div>
+                              )}
+                            </div>
+                          )}
 
-                      {index < activeSystems.length - 1 && (
-                        <div className="self-center pt-8 text-slate-300 flex-shrink-0">
-                          <ArrowLeftRight size={20} />
                         </div>
                       )}
                     </div>
-                  );
-                })}
+                    
+                    {idx === 0 && <ArrowLeftRight size={24} className="text-slate-300 transform rotate-90 xl:rotate-0 my-2 xl:my-0" />}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+
+        {/* Right side Channel Parameters */}
+        <div className="lg:col-span-3 w-full">
+          <section className="bg-white rounded-[8px] border p-5 shadow-sm">
+            <h2 className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Channel Params</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-navy-950">Latency (ms)</label>
+                <input type="number" min="0" className="w-full p-2.5 bg-slate-50 border rounded text-sm focus:bg-white outline-none focus:border-navy-950" value={latency} onChange={e => setLatency(Number(e.target.value))} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-navy-950">Jitter (ms)</label>
+                <input type="number" min="0" className="w-full p-2.5 bg-slate-50 border rounded text-sm focus:bg-white outline-none focus:border-navy-950" value={jitter} onChange={e => setJitter(Number(e.target.value))} />
               </div>
             </div>
           </section>
         </div>
 
-        {/* Sidebar */}
-        <div className="col-span-3 space-y-6">
-          <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-            <h2 className="text-[10px] font-black text-slate-400 uppercase mb-6">Channel Params</h2>
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold">Latency (ms)</label>
-                <input type="number" className="w-full p-2.5 bg-slate-50 border rounded-[6px] text-sm outline-none" value={latency} onChange={(e) => setLatency(Number(e.target.value))} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold">Jitter (ms)</label>
-                <input type="number" className="w-full p-2.5 bg-slate-50 border rounded-[6px] text-sm outline-none" value={jitter} onChange={(e) => setJitter(Number(e.target.value))} />
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-            <h2 className="text-[10px] font-black text-slate-400 uppercase mb-6">Health Checks</h2>
-            <div className="space-y-3">
-              {[
-                { id: 'deliveryComplete', label: 'DELIVERY' },
-                { id: 'noErrors', label: 'ERROR FREE' },
-                { id: 'allMatched', label: 'DDS MATCH' },
-              ].map((check) => (
-                <label key={check.id} className="flex items-center justify-between p-3 rounded-[6px] border border-slate-100 bg-slate-50/30 cursor-pointer">
-                  <span className="text-[10px] font-black text-navy-950">{check.label}</span>
-                  <input
-                    type="checkbox"
-                    checked={assertions[check.id as keyof typeof assertions]}
-                    onChange={(e) => setAssertions((prev) => ({ ...prev, [check.id]: e.target.checked }))}
-                    className="w-4 h-4 rounded text-navy-900"
-                  />
-                </label>
-              ))}
-            </div>
-          </section>
-        </div>
       </main>
     </div>
   );
 };
 
 export default NewSimulation;
-
-// import { useState, useEffect, useRef } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import {
-//   ChevronLeft, Save, Settings, ArrowLeftRight,
-//   Plus, Monitor, Trash2, Book, Radio, Database,
-// } from 'lucide-react';
-// import { useToast } from '../components/Toast';
-// // עדכון ה-Import כדי להשתמש בפונקציות מהמבנה החדש
-// import { 
-//   createSimulation, 
-//   getAllSimulations, 
-//   listSystems, 
-//   listDictionaries 
-// } from '../api/index';
-// import type { SystemInfo, Dictionary } from '../api/index';
-
-// // ─── Local-only types (UI state, never sent to server) ────────────────────────
-
-// interface SystemInterface {
-//   id: string;
-//   type: 'Writer' | 'Reader';
-//   messageCount: number;
-//   frequencyHz: number;
-// }
-
-// interface ActiveSystem {
-//   id: string;
-//   selectedSystemId: string;
-//   selectedDictId: string;
-//   interfaces: SystemInterface[];
-// }
-
-// const DEFAULT_SYSTEMS: ActiveSystem[] = [
-//   { id: '1', selectedSystemId: '', selectedDictId: '', interfaces: [] },
-//   { id: '2', selectedSystemId: '', selectedDictId: '', interfaces: [] },
-// ];
-
-// // ─── Component ────────────────────────────────────────────────────────────────
-
-// const NewSimulation = () => {
-//   const navigate = useNavigate();
-//   const { id } = useParams<{ id: string }>();
-//   const { toast } = useToast();
-//   const isEditMode = !!id;
-//   const scrollRef = useRef<HTMLDivElement>(null);
-
-//   // --- Server-bound state ---
-//   const [scenarioName, setScenarioName] = useState('');
-//   const [latency, setLatency] = useState(0);
-//   const [jitter, setJitter] = useState(0);
-//   const [saving, setSaving] = useState(false);
-//   const [assertions, setAssertions] = useState({
-//     deliveryComplete: false,
-//     noErrors: false,
-//     allMatched: false,
-//   });
-
-//   // --- Local UI-only state ---
-//   const [activeSystems, setActiveSystems] = useState<ActiveSystem[]>(DEFAULT_SYSTEMS);
-//   const [availableSystems, setAvailableSystems] = useState<SystemInfo[]>([]);
-//   const [allDictionaries, setAllDictionaries] = useState<Dictionary[]>([]);
-
-//   // ─── Load data ──────────────────────────────────────────────────────────────
-// // ─── Load data ──────────────────────────────────────────────────────────────
-//   useEffect(() => {
-//     const load = async () => {
-//       try {
-//         const [systems, dicts, scenarios] = await Promise.all([
-//           listSystems(),
-//           listDictionaries(),
-//           getAllSimulations(),
-//         ]);
-//         setAvailableSystems(systems);
-//         setAllDictionaries(dicts);
-
-//         if (!isEditMode) return;
-
-//         const scenario = scenarios.find(
-//           (s: any) => String(s.simulation_config_id || s.id) === String(id)
-//         ) as any;
-
-//         if (!scenario) return;
-
-//         setScenarioName(scenario.scenario_name || '');
-//         
-//         const config = scenario.scenario_config || scenario; 
-//         if (config) {
-//           setLatency(config.transport_latency_ms || 0);
-//           setJitter(config.transport_jitter_ms || 0);
-//         }
-//       } catch (error) {
-//         console.error("Load error:", error);
-//       }
-//     };
-
-//     load(); // <--- השורה הזו היתה חסרה! זה מה שמפעיל את הטעינה
-//   }, [id, isEditMode]); // מוודא שטוען מחדש אם ה-ID משתנה
-//   // ─── Local UI handlers (topology - never touches server) ────────────────────
-
-//   const scrollToEnd = () =>
-//     setTimeout(() => scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' }), 100);
-
-//   const addSystem = () => {
-//     setActiveSystems((prev) => [...prev, { id: Date.now().toString(), selectedSystemId: '', selectedDictId: '', interfaces: [] }]);
-//     scrollToEnd();
-//   };
-
-//   const removeSystem = (boxId: string) => {
-//     if (activeSystems.length > 2) setActiveSystems((prev) => prev.filter((s) => s.id !== boxId));
-//   };
-
-//   const updateSystem = (boxId: string, systemId: string) =>
-//     setActiveSystems((prev) => prev.map((s) => s.id === boxId ? { ...s, selectedSystemId: systemId, selectedDictId: '', interfaces: [] } : s));
-
-//   const updateDict = (boxId: string, dictId: string) =>
-//     setActiveSystems((prev) => prev.map((s) => s.id === boxId ? { ...s, selectedDictId: dictId, interfaces: [] } : s));
-
-//   const addInterface = (boxId: string, type: 'Writer' | 'Reader') =>
-//     setActiveSystems((prev) => prev.map((s) =>
-//       s.id === boxId
-//         ? { ...s, interfaces: [...s.interfaces, { id: `int-${Date.now()}`, type, messageCount: 100, frequencyHz: 10 }] }
-//         : s
-//     ));
-
-//   const updateInterface = (boxId: string, intId: string, field: keyof SystemInterface, value: any) =>
-//     setActiveSystems((prev) => prev.map((s) =>
-//       s.id === boxId
-//         ? { ...s, interfaces: s.interfaces.map((i) => i.id === intId ? { ...i, [field]: value } : i) }
-//         : s
-//     ));
-
-//   const removeInterface = (boxId: string, intId: string) =>
-//     setActiveSystems((prev) => prev.map((s) =>
-//       s.id === boxId ? { ...s, interfaces: s.interfaces.filter((i) => i.id !== intId) } : s
-//     ));
-
-//   // ─── Save - builds full hierarchy matching server models ──────────────────
-//   const handleSave = async () => {
-//     if (!scenarioName.trim()) {
-//       toast('Please enter a simulation name', 'error');
-//       return;
-//     }
-
-//     setSaving(true);
-//     try {
-//       const payload = {
-//         simulation_config_id: id || `sim-${Date.now()}`,
-//         scenario_name: scenarioName,
-//         productions: activeSystems
-//           .filter((sys) => sys.interfaces.length > 0)
-//           .map((sys) => ({
-//             production_config_id: sys.selectedSystemId,
-//             contracts: sys.interfaces.map((iface) => ({
-//               version: '1.0.0',
-//               ...(iface.type === 'Writer'
-//                 ? { 
-//                     dataWriter: { 
-//                       message_count: iface.messageCount, 
-//                       message_frequency_hz: iface.frequencyHz 
-//                     } 
-//                   }
-//                 : { 
-//                     dataReader: { 
-//                       message_count: iface.messageCount, 
-//                       message_frequency_hz: iface.frequencyHz 
-//                     } 
-//                   }
-//               ),
-//             })),
-//           })),
-//       };
-
-//       // קריאה לפונקציה הנכונה מה-API החדש
-//       await createSimulation(payload as any);
-      
-//       toast(isEditMode ? 'Updated successfully!' : 'Saved successfully!', 'success');
-//       navigate('/simulations');
-//     } catch (error) {
-//       console.error("Save error:", error);
-//       toast('Failed to save. Check if the server is running on port 3000', 'error');
-//     } finally {
-//       setSaving(false);
-//     }
-//   };
-
-//   // ─── Render ─────────────────────────────────────────────────────────────────
-
-//   return (
-//     <div className="min-h-screen bg-[#f8fafc] p-8 font-heebo" dir="ltr">
-
-//       {/* Header */}
-//       <div className="max-w-[1400px] mx-auto flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
-//         <div className="flex items-center gap-4">
-//           <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-slate-600 transition-colors">
-//             <ChevronLeft size={24} />
-//           </button>
-//           <h1 className="text-xl font-bold text-navy-950 uppercase tracking-tight">
-//             {isEditMode ? 'Edit Simulation' : 'New Simulation'}
-//           </h1>
-//         </div>
-//         <button
-//           onClick={handleSave}
-//           disabled={saving}
-//           className="bg-[#141e52] text-white px-8 py-2.5 rounded-[6px] font-bold text-[12px] hover:bg-navy-900 flex items-center gap-2 shadow-lg transition-all disabled:opacity-50"
-//         >
-//           <Save size={16} /> {saving ? 'SAVING...' : 'SAVE SIMULATION'}
-//         </button>
-//       </div>
-
-//       <main className="max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
-//         <div className="col-span-9 space-y-8">
-
-//           {/* Scenario Context */}
-//           <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-//             <div className="flex items-center gap-2 mb-6 text-slate-400">
-//               <Settings size={14} />
-//               <h2 className="text-[10px] font-black uppercase tracking-[0.2em]">Scenario Context</h2>
-//             </div>
-//             <div className="space-y-1">
-//               <label className="text-[12px] font-bold text-navy-950">Simulation Name</label>
-//               <input
-//                 className={`w-full px-4 py-3 border rounded-[6px] outline-none transition-all text-sm ${
-//                   isEditMode ? 'bg-slate-100 cursor-not-allowed text-slate-500' : 'bg-slate-50 border-slate-200 focus:border-navy-950'
-//                 }`}
-//                 value={scenarioName}
-//                 onChange={(e) => !isEditMode && setScenarioName(e.target.value)}
-//                 readOnly={isEditMode}
-//                 placeholder="Enter simulation name..."
-//               />
-//             </div>
-//           </section>
-
-//           {/* Network Topology - local UI only */}
-//           <section className="bg-white rounded-[8px] border shadow-sm overflow-hidden">
-//             <div className="px-6 py-4 border-b bg-slate-50/50 flex items-center justify-between">
-//               <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Network Topology</h2>
-//               <button onClick={addSystem} className="flex items-center gap-2 text-[10px] font-black text-navy-600 hover:text-navy-950 transition-colors">
-//                 <Plus size={14} /> ADD SYSTEM
-//               </button>
-//             </div>
-
-//             <div ref={scrollRef} className="p-8 overflow-x-auto scroll-smooth">
-//               <div className="flex items-start gap-12 min-w-max pb-4">
-//                 {activeSystems.map((sys, index) => {
-//                   const filteredDicts = allDictionaries.filter((d) => d.systemId === sys.selectedSystemId);
-//                   return (
-//                     <div key={sys.id} className="flex items-start gap-12">
-//                       <div className="w-[320px] group flex-shrink-0">
-//                         <div className="flex items-center justify-between mb-3">
-//                           <div className="flex items-center gap-2">
-//                             <div className="bg-navy-900 p-1.5 rounded text-white"><Monitor size={14} /></div>
-//                             <span className="text-[11px] font-black text-navy-900 uppercase">System {index + 1}</span>
-//                           </div>
-//                           {activeSystems.length > 2 && (
-//                             <button onClick={() => removeSystem(sys.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-//                               <Trash2 size={14} />
-//                             </button>
-//                           )}
-//                         </div>
-
-//                         <div className="bg-slate-50 border border-slate-200 rounded-[8px] p-5 shadow-sm space-y-4">
-//                           <div>
-//                             <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Select System</label>
-//                             <select
-//                               value={sys.selectedSystemId}
-//                               onChange={(e) => updateSystem(sys.id, e.target.value)}
-//                               className="w-full p-2.5 bg-white border border-slate-200 rounded font-bold text-xs outline-none"
-//                             >
-//                               <option value="">-- Choose System --</option>
-//                               {availableSystems.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-//                             </select>
-//                           </div>
-
-//                           <div className="pt-4 border-t border-slate-200">
-//                             {!sys.selectedSystemId ? (
-//                               <div className="py-4 text-center">
-//                                 <p className="text-[10px] font-bold text-red-500 mb-2 animate-pulse">! SELECT SYSTEM FIRST</p>
-//                                 <div className="py-3 border-2 border-dashed border-slate-200 rounded text-slate-300 flex items-center justify-center gap-2">
-//                                   <Book size={14} /><span className="text-[10px] font-black uppercase">Locked</span>
-//                                 </div>
-//                               </div>
-//                             ) : (
-//                               <div className="space-y-4">
-//                                 <div>
-//                                   <label className="text-[10px] font-black text-blue-500 uppercase block mb-1">Available Dictionaries</label>
-//                                   <select
-//                                     value={sys.selectedDictId}
-//                                     onChange={(e) => updateDict(sys.id, e.target.value)}
-//                                     className="w-full p-2.5 bg-white border border-blue-200 rounded font-bold text-xs outline-none mb-3"
-//                                   >
-//                                     <option value="">-- Select Dictionary --</option>
-//                                     {filteredDicts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-//                                   </select>
-//                                 </div>
-
-//                                 {sys.selectedDictId && (
-//                                   <div className="space-y-3 pt-2">
-//                                     <label className="block text-[9px] font-black text-slate-400 uppercase tracking-tighter">Active Interfaces</label>
-//                                     {sys.interfaces.map((int) => (
-//                                       <div key={int.id} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm group/int">
-//                                         <div className="flex items-center justify-between mb-3">
-//                                           <div className="flex items-center gap-2">
-//                                             {int.type === 'Writer'
-//                                               ? <Radio size={14} className="text-orange-500" />
-//                                               : <Database size={14} className="text-emerald-500" />}
-//                                             <span className="text-[10px] font-black uppercase text-slate-700">{int.type}</span>
-//                                           </div>
-//                                           <button onClick={() => removeInterface(sys.id, int.id)} className="text-slate-300 hover:text-red-500 transition-colors">
-//                                             <Trash2 size={12} />
-//                                           </button>
-//                                         </div>
-//                                         <div className="grid grid-cols-2 gap-3">
-//                                           <div className="space-y-1">
-//                                             <label className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Messages</label>
-//                                             <input
-//                                               type="number"
-//                                               className="w-full border border-slate-200 rounded p-1.5 text-[10px] font-bold outline-none"
-//                                               value={int.messageCount}
-//                                               onChange={(e) => updateInterface(sys.id, int.id, 'messageCount', Number(e.target.value))}
-//                                             />
-//                                           </div>
-//                                           <div className="space-y-1">
-//                                             <label className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Freq (Hz)</label>
-//                                             <input
-//                                               type="number"
-//                                               className="w-full border border-slate-200 rounded p-1.5 text-[10px] font-bold outline-none"
-//                                               value={int.frequencyHz}
-//                                               onChange={(e) => updateInterface(sys.id, int.id, 'frequencyHz', Number(e.target.value))}
-//                                             />
-//                                           </div>
-//                                         </div>
-//                                       </div>
-//                                     ))}
-//                                     <div className="flex gap-2 pt-2">
-//                                       <button onClick={() => addInterface(sys.id, 'Writer')} className="flex-1 py-2 border border-dashed border-orange-200 rounded text-[9px] font-black text-orange-600 flex items-center justify-center gap-1">
-//                                         <Plus size={12} /> WRITER
-//                                       </button>
-//                                       <button onClick={() => addInterface(sys.id, 'Reader')} className="flex-1 py-2 border border-dashed border-emerald-200 rounded text-[9px] font-black text-emerald-600 flex items-center justify-center gap-1">
-//                                         <Plus size={12} /> READER
-//                                       </button>
-//                                     </div>
-//                                   </div>
-//                                 )}
-//                               </div>
-//                             )}
-//                           </div>
-//                         </div>
-//                       </div>
-
-//                       {index < activeSystems.length - 1 && (
-//                         <div className="self-center pt-8 text-slate-300 flex-shrink-0">
-//                           <ArrowLeftRight size={20} />
-//                         </div>
-//                       )}
-//                     </div>
-//                   );
-//                 })}
-//               </div>
-//             </div>
-//           </section>
-//         </div>
-
-//         {/* Sidebar */}
-//         <div className="col-span-3 space-y-6">
-//           <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-//             <h2 className="text-[10px] font-black text-slate-400 uppercase mb-6">Channel Params</h2>
-//             <div className="space-y-4">
-//               <div className="space-y-1">
-//                 <label className="text-[11px] font-bold">Latency (ms)</label>
-//                 <input type="number" className="w-full p-2.5 bg-slate-50 border rounded-[6px] text-sm outline-none" value={latency} onChange={(e) => setLatency(Number(e.target.value))} />
-//               </div>
-//               <div className="space-y-1">
-//                 <label className="text-[11px] font-bold">Jitter (ms)</label>
-//                 <input type="number" className="w-full p-2.5 bg-slate-50 border rounded-[6px] text-sm outline-none" value={jitter} onChange={(e) => setJitter(Number(e.target.value))} />
-//               </div>
-//             </div>
-//           </section>
-
-//           <section className="bg-white rounded-[8px] border p-6 shadow-sm">
-//             <h2 className="text-[10px] font-black text-slate-400 uppercase mb-6">Health Checks</h2>
-//             <div className="space-y-3">
-//               {[
-//                 { id: 'deliveryComplete', label: 'DELIVERY' },
-//                 { id: 'noErrors', label: 'ERROR FREE' },
-//                 { id: 'allMatched', label: 'DDS MATCH' },
-//               ].map((check) => (
-//                 <label key={check.id} className="flex items-center justify-between p-3 rounded-[6px] border border-slate-100 bg-slate-50/30 cursor-pointer">
-//                   <span className="text-[10px] font-black text-navy-950">{check.label}</span>
-//                   <input
-//                     type="checkbox"
-//                     checked={assertions[check.id as keyof typeof assertions]}
-//                     onChange={(e) => setAssertions((prev) => ({ ...prev, [check.id]: e.target.checked }))}
-//                     className="w-4 h-4 rounded text-navy-900"
-//                   />
-//                 </label>
-//               ))}
-//             </div>
-//           </section>
-//         </div>
-//       </main>
-//     </div>
-//   );
-// };
-
-// export default NewSimulation;

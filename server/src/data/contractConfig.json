@@ -1,0 +1,50 @@
+[
+  { 
+    "contract_config_id": "cont-1-v1.2", 
+    "system_id": "sys-1", 
+    "name": "Target_Tracks_Feed", 
+    "version": "v1.2.0" 
+  },
+  { 
+    "contract_config_id": "cont-1-v1.3", 
+    "system_id": "sys-1", 
+    "name": "Target_Tracks_Feed", 
+    "version": "v1.3.0" 
+  },
+  {  
+    "contract_config_id": "cont-2-v1.0", 
+    "system_id": "sys-1", 
+    "name": "System_Status_Report", 
+    "version": "v1.0.0" 
+  },
+  { 
+    "contract_config_id": "cont-3-v4.0", 
+    "system_id": "sys-2",  
+    "name": "C2_Battle_Management",  
+    "version": "v4.0.0" 
+  },
+    { 
+    "contract_config_id": "cont-1-v1.2", 
+    "system_id": "sys-2", 
+    "name": "C2_Battle_Management", 
+    "version": "v1.2.0" 
+  },
+  { 
+    "contract_config_id": "cont-1-v1.3", 
+    "system_id": "sys-3", 
+    "name": "C4_Battle_Management", 
+    "version": "v1.3.0" 
+  },
+  { 
+    "contract_config_id": "cont-2-v1.0", 
+    "system_id": "sys-4", 
+    "name": "C5_Battle_Management", 
+    "version": "v1.0.0" 
+  },
+  { 
+    "contract_config_id": "cont-3-v4.0", 
+    "system_id": "sys-5", 
+    "name": "C6_Battle_Management", 
+    "version": "v4.0.0" 
+  }
+]

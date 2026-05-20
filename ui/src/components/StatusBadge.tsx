@@ -1,80 +1,57 @@
-// import { CheckCircle2, XCircle, Clock, AlertTriangle, Loader2 } from "lucide-react";
 
-// const STATUS_STYLES: Record<string, { bg: string; text: string; icon: any }> = {
-//   passed: { bg: "bg-emerald-900/40 border border-emerald-700/30", text: "text-emerald-400", icon: CheckCircle2 },
-//   failed: { bg: "bg-red-900/40 border border-red-700/30", text: "text-red-400", icon: XCircle },
-//   error: { bg: "bg-red-900/40 border border-red-700/30", text: "text-red-400", icon: AlertTriangle },
-//   timeout: { bg: "bg-amber-900/40 border border-amber-700/30", text: "text-amber-400", icon: Clock },
-//   running: { bg: "bg-blue-900/40 border border-blue-700/30", text: "text-blue-300", icon: Loader2 },
-//   pending: { bg: "bg-gray-800 border border-gray-600/30", text: "text-gray-300", icon: Clock },
-// };
 
-// export default function StatusBadge({ status, size = "sm" }: { status: string; size?: "sm" | "lg" }) {
-//   const style = STATUS_STYLES[status] ?? STATUS_STYLES.pending;
-//   const Icon = style.icon;
-//   const isRunning = status === "running";
-//   const textSize = size === "lg" ? "text-sm font-semibold" : "text-xs font-medium";
-//   const iconSize = size === "lg" ? 16 : 13;
-//   const px = size === "lg" ? "px-3 py-1.5" : "px-2 py-0.5";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
-//   return (
-//     <span className={`inline-flex items-center gap-1.5 rounded-full ${style.bg} ${style.text} ${textSize} ${px}`}>
-//       <Icon size={iconSize} className={isRunning ? "animate-spin" : ""} />
-//       {status.toUpperCase()}
-//     </span>
-//   );
-// }
+// במקום enum - משתמשים ב-const object עם טיפוס תואם
+export const RunStatus = {
+  PASSED: 'Passed',
+  FAILED: 'Failed',
+  IN_PROGRESS: 'In Progress'
+} as const;
 
-import { CheckCircle2, XCircle, Clock, AlertTriangle, Loader2 } from "lucide-react";
+export type RunStatusType = typeof RunStatus[keyof typeof RunStatus];
 
-// עדכון צבעים לשפה עיצובית בהירה, נקייה ויוקרתית התואמת לפיגמה
-const STATUS_STYLES: Record<string, { bg: string; text: string; icon: any }> = {
-  passed: { 
-    bg: "bg-[#E2F0D9] border border-[#B4C6E7]/20", 
-    text: "text-[#385723]", 
-    icon: CheckCircle2 
+const STATUS_STYLES: Record<RunStatusType, { bg: string; text: string; icon: any }> = {
+  [RunStatus.PASSED]: {
+    bg: "bg-emerald-950/40 border border-emerald-500/30",
+    text: "text-emerald-400",
+    icon: CheckCircle2,
   },
-  failed: { 
-    bg: "bg-[#FCE4D6] border border-[#F8CBAD]/30", 
-    text: "text-[#C65911]", 
-    icon: XCircle 
+  [RunStatus.FAILED]: {
+    bg: "bg-rose-950/40 border border-rose-500/30",
+    text: "text-rose-400",
+    icon: XCircle,
   },
-  error: { 
-    bg: "bg-[#FFF2CC] border border-[#FFE699]/30", 
-    text: "text-[#7F6000]", 
-    icon: AlertTriangle 
-  },
-  timeout: { 
-    bg: "bg-[#EDEDED] border border-[#D9D9D9]/30", 
-    text: "text-[#595959]", 
-    icon: Clock 
-  },
-  running: { 
-    bg: "bg-blue-50 border border-blue-200/50", 
-    text: "text-blue-600", 
-    icon: Loader2 
-  },
-  pending: { 
-    bg: "bg-slate-50 border border-slate-200/50", 
-    text: "text-slate-400", 
-    icon: Clock 
-  },
+  [RunStatus.IN_PROGRESS]: {
+    bg: "bg-sky-950/40 border border-sky-500/30",
+    text: "text-sky-400",
+    icon: Loader2,
+  }
 };
 
-export default function StatusBadge({ status, size = "sm" }: { status: string; size?: "sm" | "lg" }) {
-  const style = STATUS_STYLES[status] ?? STATUS_STYLES.pending;
-  const Icon = style.icon;
-  const isRunning = status === "running";
+function toRunStatus(raw: string): RunStatusType {
+  if (!raw) return RunStatus.IN_PROGRESS;
   
-  // שימוש בפונט heebo החדש שלנו מהקונפיגורציה
-  const textSize = size === "lg" ? "text-xs font-black tracking-wider font-heebo" : "text-[10px] font-black tracking-wider font-heebo";
+  const normalized = raw.toLowerCase().trim();
+  
+  if (normalized === 'passed' || normalized === 'success') return RunStatus.PASSED;
+  if (normalized === 'failed' || normalized === 'error' || normalized === 'stopped') return RunStatus.FAILED;
+  
+  return RunStatus.IN_PROGRESS;
+}
+
+export default function StatusBadge({ status, size = "sm" }: { status: string; size?: "sm" | "lg" }) {
+  const normalized = toRunStatus(status);
+  const style = STATUS_STYLES[normalized];
+  const Icon = style.icon;
+  const textSize = size === "lg" ? "text-[11px] font-black tracking-widest" : "text-[9px] font-black tracking-widest";
   const iconSize = size === "lg" ? 14 : 12;
-  const px = size === "lg" ? "px-3.5 py-1.5" : "px-2.5 py-1";
+  const px = size === "lg" ? "px-3 py-1" : "px-2.5 py-0.5";
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full ${style.bg} ${style.text} ${textSize} ${px} transition-all`}>
-      <Icon size={iconSize} className={isRunning ? "animate-spin" : ""} />
-      {status.toUpperCase()}
+    <span className={`inline-flex items-center gap-1.5 rounded-full uppercase ${style.bg} ${style.text} ${textSize} ${px} transition-all shadow-inner`}>
+      <Icon size={iconSize} className={normalized === RunStatus.IN_PROGRESS ? "animate-spin" : ""} />
+      {normalized}
     </span>
   );
 }

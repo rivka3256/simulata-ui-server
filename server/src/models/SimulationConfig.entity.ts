@@ -8,7 +8,7 @@ export class SimulationConfig {
   simulation_config_id: string;
 
   @Column({ type: 'text' })
-  scenario_name: string;
+  simulation_name: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

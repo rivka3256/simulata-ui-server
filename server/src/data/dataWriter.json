@@ -1,0 +1,38 @@
+
+[
+  {
+    "data_writer_id": "dw-1",
+    "contract_config_id": "cont-1",
+    "name": "Track_Publisher",
+    "message_count": 1000,
+    "message_frequency_hz": 50
+  },
+  {
+    "data_writer_id": "dw-2",
+    "contract_config_id": "cont-2",
+    "name": "Status_Broadcaster",
+    "message_count": 100,
+    "message_frequency_hz": 5
+  },
+  {
+    "data_writer_id": "dw-3",
+    "contract_config_id": "cont-3",
+    "name": "Command_Issuer",
+    "message_count": 50,
+    "message_frequency_hz": 2
+  },
+  {
+    "data_writer_id": "dw-4",
+    "contract_config_id": "cont-4",
+    "name": "Missile_Telemetry_Sender",
+    "message_count": 5000,
+    "message_frequency_hz": 100
+  },
+  {
+    "data_writer_id": "dw-5",
+    "contract_config_id": "cont-5",
+    "name": "Drone_State_Sender",
+    "message_count": 2000,
+    "message_frequency_hz": 60
+  }
+]

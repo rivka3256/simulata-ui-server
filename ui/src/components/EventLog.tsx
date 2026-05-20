@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { RunEventInfo } from "../api";
+import type { RunEventInfo } from "../types/api";
 
 const SEVERITY_COLORS: Record<string, string> = {
   debug: "text-gray-500",

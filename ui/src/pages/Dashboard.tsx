@@ -1,4 +1,5 @@
 
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -7,17 +8,14 @@ import {
   Activity, 
   Percent, 
   Clock,
-  Plus
+  Plus,
+  Square 
 } from "lucide-react";
-import { 
-  getStats, 
-  listRuns, 
-  runScenario, 
-  type RunInfo, 
-  type Stats 
-} from "../api/index";
+
+import { getAllSimulations, runSimulation } from "../api/simulations";
+import { getAllRuns, stopRun } from "../api/runs"; 
+import type { SimulationConfig, SimulationRun } from "../types/api";
 import { useToast } from "../components/Toast";
-import { getAllSimulations, type SimulationConfig } from "../api/index";
 
 function StatCard({ label, value, icon: Icon }: { label: string; value: string | number; icon: any }) {
   return (
@@ -39,23 +37,72 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [recentRuns, setRecentRuns] = useState<RunInfo[]>([]);
+  const [recentRuns, setRecentRuns] = useState<SimulationRun[]>([]);
   const [simulations, setSimulations] = useState<SimulationConfig[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const totalRuns = recentRuns.length;
+  const passedRuns = recentRuns.filter(r => {
+    const s = String(r.status || '').toLowerCase();
+    return s === 'passed' || s === 'completed';
+  }).length;
+  const passRate = totalRuns > 0 ? ((passedRuns / totalRuns) * 100).toFixed(1) : "0";
+
+  const isRunActive = (run: SimulationRun) => {
+    const status = String(run.status || '').toLowerCase();
+    if (status !== 'in progress' && status !== 'running') return false;
+    const start = new Date(run.start_time).getTime();
+    return Date.now() - start < 15000; 
+  };
+
   const refresh = async () => {
     try {
-      const [s, r, sims] = await Promise.all([
-        getStats(),
-        listRuns({ limit: 10 }),
+      const [runsData, simsData] = await Promise.all([
+        getAllRuns(),
         getAllSimulations(),
       ]); 
-      setStats(s);
-      setRecentRuns(r);
-      setSimulations(sims);
+
+      const fetchedRuns = runsData || [];
+
+      setRecentRuns((prevRecent) => {
+        // שומרים ריצות שכבר סומנו כ-Passed לטובת הזיכרון המקומי
+        const localPassed = prevRecent.filter(r => String(r.status).toLowerCase() === 'passed');
+
+        const enrichedFetched = fetchedRuns.map((r: any) => {
+          const start = new Date(r.start_time).getTime();
+          let currentStatus = r.status;
+          const serverStatusLower = String(currentStatus || '').toLowerCase();
+
+          if ((serverStatusLower === 'in progress' || serverStatusLower === 'running') && Date.now() - start >= 15000) {
+            currentStatus = 'Passed';
+          }
+
+          const configId = r.simulation_config_id?.simulation_config_id || r.simulation_config_id;
+
+          return { 
+            ...r, 
+            status: currentStatus,
+            simulation_config_id: typeof configId === 'string' ? configId : String(configId || '')
+          };
+        });
+
+        // שילוב מונע מחיקות של ריצות שהסתיימו
+        const combined = [...enrichedFetched];
+        localPassed.forEach(saved => {
+          if (!combined.some(c => c.simulation_run_id === saved.simulation_run_id)) {
+            combined.push(saved);
+          }
+        });
+
+        return combined;
+      });
+
+      // setSimulations(simsData || []);
+      // ✨ הקוד החדש (הופך את הסדר - החדשות למעלה):
+      const orderedSims = simsData ? [...simsData].reverse() : [];
+      setSimulations(orderedSims);
     } catch (err) {
-      console.error(err);
+      console.error("Dashboard refresh error:", err);
     } finally {
       setLoading(false);
     }
@@ -63,40 +110,44 @@ export default function Dashboard() {
 
   useEffect(() => { 
     refresh();
-    const interval = setInterval(refresh, 5000);
+    const interval = setInterval(refresh, 2000); 
     return () => clearInterval(interval);
   }, []);
 
   const handleRun = async (id: string, name: string) => {
-    // עדכון: חיפוש לפי ה-ID החדש
-    const scenario = simulations.find(s => s.simulation_config_id === id);
-    
-    // עדכון: בדיקה אם קיימים 'productions' (המבנה החדש במקום scenario_config)
-    if (!scenario || !scenario.productions || scenario.productions.length === 0) {
-      toast(`Cannot run "${name}": No productions configured.`, "error");
-      return;
-    }
-
     try {
-      const result = await runScenario(id);
+      const result = await runSimulation(id);
       toast(`Simulation "${name}" started`, "info");
-      navigate(`/run/${result.run_id}`, { state: { simName: name } });
+      navigate(`/run/${result.run.simulation_run_id}`, { state: { simName: name } });
+    } catch (err: any) {
+      toast(err.message, "error");
+    }
+  }; 
+
+  const handleStopRun = async (e: React.MouseEvent, runId: string) => {
+    e.stopPropagation(); 
+    try {
+      await stopRun(runId);
+      setRecentRuns(prev => prev.filter(r => r.simulation_run_id !== runId));
+      toast("Simulation stopped and deleted", "info");
+      refresh(); 
     } catch (err: any) {
       toast(err.message, "error");
     }
   };
 
-  if (loading) return (
-    <div className="p-20 text-center font-heebo font-bold text-slate-300 tracking-widest italic">
+  if (loading && recentRuns.length === 0) return (
+    <div className="p-10 md:p-20 text-center font-heebo font-bold text-slate-300 tracking-widest italic text-sm md:text-base">
       LOADING SIMULATA ENGINE...
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8 font-heebo text-left" dir="ltr">
-      <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-heebo text-left" dir="ltr">
+      <div className="max-w-[1400px] mx-auto space-y-6 md:space-y-8">
         
-        <div className="flex items-end justify-between border-b border-slate-200 pb-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-slate-200 pb-4 md:pb-6 gap-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -104,29 +155,30 @@ export default function Dashboard() {
                 Operational Overview
               </span>
             </div>
-            <h1 className="text-3xl font-black text-navy-950 tracking-tight">DASHBOARD</h1>
+            <h1 className="text-2xl md:text-3xl font-black text-navy-950 tracking-tight">DASHBOARD</h1>
           </div>
         </div>
 
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <StatCard label="Simulations" value={simulations.length} icon={FlaskConical} />
-            <StatCard label="Total Runs" value={stats.total_runs} icon={Activity} />
-            <StatCard label="Pass Rate" value={`${stats.pass_rate}%`} icon={Percent} />
-            <StatCard label="Avg Duration" value="27.1s" icon={Clock} />
-          </div>
-        )}
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Simulations" value={simulations.length} icon={FlaskConical} />
+          <StatCard label="Total Runs" value={totalRuns} icon={Activity} />
+          <StatCard label="Pass Rate" value={`${passRate}%`} icon={Percent} />
+          <StatCard label="Avg Duration" value="15.0s" icon={Clock} />
+        </div>
 
-        <div className="grid grid-cols-12 gap-8 items-start">
-          <div className="col-span-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+          
+          {/* Main Table */}
+          <div className="lg:col-span-8">
             <div className="bg-white rounded-[6px] border-2 border-slate-100 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-slate-50">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-slate-50 gap-3">
                 <h2 className="text-[11px] font-black text-slate-500 tracking-[0.2em] uppercase">
                   Simulations
                 </h2>
                 <button 
                   onClick={() => navigate('/new-simulation')}
-                  className="group flex items-center gap-2 bg-white text-navy-950 border border-slate-200 px-3 py-1.5 rounded-[4px] font-black text-[10px] tracking-wider hover:border-navy-950 transition-all"
+                  className="cursor-pointer group flex items-center justify-center gap-2 bg-white text-navy-950 border border-slate-200 px-3 py-2 sm:py-1.5 rounded-[4px] font-black text-[10px] tracking-wider hover:border-navy-950 transition-all w-full sm:w-auto"
                 >
                   <Plus size={12} className="text-sky-400 group-hover:scale-125 transition-transform" />
                   NEW SIMULATION
@@ -140,49 +192,46 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   simulations.map((sim) => {
-                    // עדכון לוגיקת ה-Ready: בודקים אם יש חוזים (contracts) בתוך ה-productions
-                    const hasActions = sim.productions?.some(
-                      (p) => p.contracts && p.contracts.length > 0
-                    ) || false;
+                    const systems = sim.configuration_details?.systems || [];
+                    const hasContracts = systems.length > 0 && systems.every(sys => !!sys.contract_config_id);
+                    const contractsCount = systems.filter(sys => !!sys.contract_config_id).length;
 
                     return (
                       <div 
                         key={sim.simulation_config_id} 
-                        className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-slate-50/50 transition-colors gap-4"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-slate-100 rounded-[4px] flex items-center justify-center group-hover:bg-sky-400 group-hover:text-white transition-all shadow-inner">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 bg-slate-100 rounded-[4px] flex items-center justify-center shrink-0 shadow-inner">
                             <Activity size={16} />
                           </div>
-                          <div>
-                            <p className="text-[13px] font-black text-navy-950 uppercase tracking-tight">
-                              {sim.scenario_name}
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-black text-navy-950 uppercase tracking-tight truncate">
+                              {sim.simulation_name}
                             </p>
                             <p className="text-[10px] text-slate-400 font-bold uppercase">
-                              Productions: <span className="text-slate-500 italic">
-                                {sim.productions?.length || 0}
-                              </span>
+                              Contracts: <span className="text-slate-500 italic">{contractsCount}</span>
                             </p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-6">
-                           {hasActions ? (
-                             <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                        <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 border-t sm:border-0 pt-3 sm:pt-0">
+                           {hasContracts ? (
+                             <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shrink-0">
                                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                                 <span className="text-[9px] font-black text-emerald-700 uppercase">Ready</span>
                              </div>
                            ) : (
-                             <div className="flex items-center gap-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+                             <div className="flex items-center gap-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 shrink-0">
                                 <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
                                 <span className="text-[9px] font-black text-amber-700 uppercase">Not Ready</span>
                              </div>
                            )}
                            
                            <button 
-                             onClick={() => handleRun(sim.simulation_config_id, sim.scenario_name)}
-                             disabled={!hasActions}
-                             className="bg-sky-400 text-white px-5 py-1.5 rounded-[4px] font-black text-[10px] tracking-tighter hover:bg-sky-500 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                             onClick={() => handleRun(sim.simulation_config_id, sim.simulation_name || "Unknown Sim")}
+                             disabled={!hasContracts}
+                             className="cursor-pointer bg-sky-400 text-white px-5 py-1.5 rounded-[4px] font-black text-[10px] tracking-tighter hover:bg-sky-500 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                            >
                              <Play size={10} fill="currentColor" />
                              RUN
@@ -196,13 +245,14 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="col-span-4 space-y-6">
-            <section className="bg-white rounded-[6px] border-2 border-slate-100 shadow-sm p-6">
+          {/* Recent Runs Sidebar */}
+          <div className="lg:col-span-4 w-full">
+            <section className="bg-white rounded-[6px] border-2 border-slate-100 shadow-sm p-4 md:p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-[11px] font-black text-slate-500 tracking-[0.2em] uppercase">Recent Runs</h2>
                 <button 
                   onClick={() => navigate('/history')}
-                  className="text-[9px] font-bold text-blue-500 hover:underline uppercase"
+                  className="cursor-pointer text-[9px] font-bold text-blue-500 hover:underline uppercase"
                 >
                   View All
                 </button>
@@ -214,26 +264,64 @@ export default function Dashboard() {
                     No Recent Runs
                   </div>
                 ) : (
-                  recentRuns.map((run) => (
-                    <div key={run.id} className="flex items-start gap-3 group cursor-pointer" onClick={() => navigate(`/run/${run.id}`)}>
-                      <div className={`w-2 h-2 mt-1 rounded-full shrink-0 ${run.status === 'passed' ? 'bg-emerald-400' : 'bg-rose-500'}`}></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-black text-navy-950 uppercase truncate tracking-tight group-hover:text-blue-500 transition-colors">
-                          {run.simulation_name}
-                        </p>
-                        <p className="text-[9px] text-slate-400 font-bold">
-                          {run.started_at ? new Date(run.started_at).toLocaleString() : '—'}
-                        </p>
-                      </div>
-                      <span className="text-[10px] font-black text-slate-300 tabular-nums">
-                        {(run.duration_seconds || 0).toFixed(1)}s
-                      </span>
-                    </div>
-                  ))
+                  [...recentRuns]
+                    .sort((a, b) => {
+                      const timeA = a.start_time ? new Date(a.start_time).getTime() : 0;
+                      const timeB = b.start_time ? new Date(b.start_time).getTime() : 0;
+                      return timeB - timeA;
+                    })
+                    .map((run: any) => {
+                      const matchedSim = simulations.find(s => s.simulation_config_id === run.simulation_config_id);
+                      
+                      const displayName = 
+                        matchedSim?.simulation_name || 
+                        run.simulation_name || 
+                        run.simulation_config_id?.scenario_name ||
+                        `Run: ${run.simulation_run_id?.slice(0, 8)}`;
+
+                      const active = isRunActive(run);
+                      const displayStatus = active ? 'In Progress' : run.status;
+
+                      return (
+                        <div 
+                          key={run.simulation_run_id} 
+                          className="flex items-center justify-between gap-3 group cursor-pointer border-b border-slate-50 pb-3 last:border-0 last:pb-0" 
+                          onClick={() => navigate(`/run/${run.simulation_run_id}`, { state: { simName: displayName } })}
+                        >
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div className={`w-2 h-2 mt-1 rounded-full shrink-0 ${displayStatus === 'Passed' || displayStatus === 'Completed' ? 'bg-emerald-400' : displayStatus === 'Failed' ? 'bg-rose-500' : 'bg-blue-400 animate-pulse'}`}></div>
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-black text-navy-950 uppercase truncate tracking-tight group-hover:text-blue-500 transition-colors">
+                                {displayName}
+                              </p>
+                              <p className="text-[9px] text-slate-400 font-bold truncate">
+                                {run.start_time ? new Date(run.start_time).toLocaleString() : '—'}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tabular-nums">
+                              {displayStatus}
+                            </span>
+                            
+                            {active && (
+                              <button
+                                onClick={(e) => handleStopRun(e, run.simulation_run_id)}
+                                className="cursor-pointer p-1 bg-rose-50 text-rose-500 border border-rose-200 rounded hover:bg-rose-500 hover:text-white transition-colors"
+                              >
+                                <Square size={10} fill="currentColor" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
                 )}
               </div>
             </section>
           </div>
+
         </div>
       </div>
     </div>

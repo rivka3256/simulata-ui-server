@@ -1,3 +1,4 @@
+
 import { useMemo } from "react";
 
 interface TopicNode { name: string; fields?: { name: string; type: string }[] }
@@ -10,7 +11,7 @@ interface LiveStats {
 }
 interface Props { config: Record<string, any>; liveStats?: LiveStats; isRunning?: boolean; compact?: boolean }
 
-const NODE_W = 160, NODE_H = 48, TOPIC_W = 140, TOPIC_H = 40, Y_GAP = 20, COL_GAP = 100;
+const NODE_W = 160, NODE_H = 48, TOPIC_W = 140, TOPIC_H = 40, Y_GAP = 24, COL_GAP = 120;
 
 function parseConfig(config: Record<string, any>) {
   const topics: TopicNode[] = (config.topics ?? []).map((t: any) => ({ name: t.name, fields: t.fields }));
@@ -35,7 +36,7 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
   const maxPubH = Math.max(publishers.length * (NODE_H + Y_GAP) - Y_GAP, 0);
   const maxTopicH = Math.max(topics.length * (TOPIC_H + Y_GAP) - Y_GAP, 0);
   const maxSubH = Math.max(subscribers.length * (NODE_H + Y_GAP) - Y_GAP, 0);
-  const totalH = Math.max(maxPubH, maxTopicH, maxSubH, 100);
+  const totalH = Math.max(maxPubH, maxTopicH, maxSubH, 120);
 
   pubPositions.forEach((p) => (p.y += (totalH - maxPubH) / 2));
   topicPositions.forEach((p) => (p.y += (totalH - maxTopicH) / 2));
@@ -45,7 +46,7 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
   const svgH = totalH + 100;
   const fontSize = compact ? 11 : 13;
 
-  type Edge = { from: any; to: any; topic: string; type: "pub"|"sub"; label?: string; color: string; animated: boolean };
+  type Edge = { from: any; to: any; topic: string; type: "pub" | "sub"; label?: string; color: string; animated: boolean };
   const edges: Edge[] = [];
 
   publishers.forEach((pub, pi) => {
@@ -54,7 +55,15 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
       if (ti === -1) return;
       const isIncompat = liveStats?.incompatible.has(`${pub.name}:${topic}`);
       const sentCount = liveStats?.sent[topic];
-      edges.push({ from: { ...pubPositions[pi], w: NODE_W, h: NODE_H }, to: { ...topicPositions[ti], w: TOPIC_W, h: TOPIC_H }, topic, type: "pub", label: sentCount !== undefined ? `${sentCount} sent` : undefined, color: isIncompat ? "#ef4444" : "#3b82f6", animated: isRunning && !isIncompat });
+      edges.push({ 
+        from: { ...pubPositions[pi], w: NODE_W, h: NODE_H }, 
+        to: { ...topicPositions[ti], w: TOPIC_W, h: TOPIC_H }, 
+        topic, 
+        type: "pub", 
+        label: sentCount !== undefined ? `${sentCount} sent` : undefined, 
+        color: isIncompat ? "#f43f5e" : "#38bdf8", 
+        animated: isRunning && !isIncompat 
+      });
     });
   });
 
@@ -64,14 +73,22 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
       if (ti === -1) return;
       const isIncompat = liveStats?.incompatible.has(`${sub.name}:${topic}`);
       const recvCount = liveStats?.received[topic];
-      edges.push({ from: { ...topicPositions[ti], w: TOPIC_W, h: TOPIC_H }, to: { ...subPositions[si], w: NODE_W, h: NODE_H }, topic, type: "sub", label: recvCount !== undefined ? `${recvCount} recv` : undefined, color: isIncompat ? "#ef4444" : "#10b981", animated: isRunning && !isIncompat });
+      edges.push({ 
+        from: { ...topicPositions[ti], w: TOPIC_W, h: TOPIC_H }, 
+        to: { ...subPositions[si], w: NODE_W, h: NODE_H }, 
+        topic, 
+        type: "sub", 
+        label: recvCount !== undefined ? `${recvCount} recv` : undefined, 
+        color: isIncompat ? "#f43f5e" : "#34d399", 
+        animated: isRunning && !isIncompat 
+      });
     });
   });
 
   return (
-    <svg width="100%" height="100%" viewBox={`0 0 ${svgW} ${svgH}`} preserveAspectRatio="xMidYMid meet" className="select-none">
+    <svg width="100%" height="100%" viewBox={`0 0 ${svgW} ${svgH}`} preserveAspectRatio="xMidYMid meet" className="select-none font-['Heebo']">
       <defs>
-        {[["blue","#3b82f6"],["green","#10b981"],["red","#ef4444"]].map(([id, fill]) => (
+        {[["sky", "#38bdf8"], ["emerald", "#34d399"], ["rose", "#f43f5e"]].map(([id, fill]) => (
           <marker key={id} id={`arrow-${id}`} markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
             <path d="M0,0 L8,3 L0,6" fill={fill} />
           </marker>
@@ -80,9 +97,9 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
 
       {!compact && (
         <>
-          <text x={colX[0]+NODE_W/2} y={30} textAnchor="middle" fill="#6b7280" fontSize={11} fontWeight="600" letterSpacing="0.05em">PUBLISHERS</text>
-          <text x={colX[1]+TOPIC_W/2} y={30} textAnchor="middle" fill="#6b7280" fontSize={11} fontWeight="600" letterSpacing="0.05em">TOPICS</text>
-          <text x={colX[2]+NODE_W/2} y={30} textAnchor="middle" fill="#6b7280" fontSize={11} fontWeight="600" letterSpacing="0.05em">SUBSCRIBERS</text>
+          <text x={colX[0] + NODE_W / 2} y={25} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight="800" letterSpacing="0.1em">PUBLISHERS</text>
+          <text x={colX[1] + TOPIC_W / 2} y={25} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight="800" letterSpacing="0.1em">TOPICS</text>
+          <text x={colX[2] + NODE_W / 2} y={25} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight="800" letterSpacing="0.1em">SUBSCRIBERS</text>
         </>
       )}
 
@@ -90,14 +107,14 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
         const x1 = edge.from.x + edge.from.w, y1 = edge.from.y + edge.from.h / 2;
         const x2 = edge.to.x, y2 = edge.to.y + edge.to.h / 2;
         const cx1 = x1 + (x2 - x1) * 0.4, cx2 = x1 + (x2 - x1) * 0.6;
-        const markerId = edge.color === "#ef4444" ? "arrow-red" : edge.type === "pub" ? "arrow-blue" : "arrow-green";
+        const markerId = edge.color === "#f43f5e" ? "arrow-rose" : edge.type === "pub" ? "arrow-sky" : "arrow-emerald";
         return (
           <g key={`edge-${i}`}>
-            <path d={`M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`} fill="none" stroke={edge.color} strokeWidth={compact ? 1.5 : 2} strokeOpacity={0.6} markerEnd={`url(#${markerId})`} strokeDasharray={edge.animated ? "6 4" : undefined}>
-              {edge.animated && <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.8s" repeatCount="indefinite" />}
+            <path d={`M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`} fill="none" stroke={edge.color} strokeWidth={compact ? 1.5 : 2} strokeOpacity={0.7} markerEnd={`url(#${markerId})`} strokeDasharray={edge.animated ? "6 4" : undefined}>
+              {edge.animated && <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.6s" repeatCount="indefinite" />}
             </path>
             {edge.label && !compact && (
-              <text x={(x1+x2)/2} y={(y1+y2)/2-6} textAnchor="middle" fill={edge.color} fontSize={9} fontWeight="500">{edge.label}</text>
+              <text x={(x1 + x2) / 2} y={(y1 + y2) / 2 - 8} textAnchor="middle" fill={edge.color} fontSize={10} fontWeight="700" className="tabular-nums bg-slate-950 px-1">{edge.label}</text>
             )}
           </g>
         );
@@ -105,29 +122,29 @@ export default function SimulationGraph({ config, liveStats, isRunning = false, 
 
       {publishers.map((pub, i) => (
         <g key={`pub-${pub.name}`}>
-          <rect x={pubPositions[i].x} y={pubPositions[i].y} width={NODE_W} height={NODE_H} rx={8} fill="#1e3a5f" stroke="#3b82f6" strokeWidth={1.5} />
-          <text x={pubPositions[i].x+NODE_W/2} y={pubPositions[i].y+NODE_H/2+1} textAnchor="middle" dominantBaseline="middle" fill="#e2e8f0" fontSize={fontSize} fontWeight="600">
-            {pub.name.length > 16 ? pub.name.slice(0,15)+"…" : pub.name}
+          <rect x={pubPositions[i].x} y={pubPositions[i].y} width={NODE_W} height={NODE_H} rx={12} fill="#0c4a6e" fillOpacity={0.4} stroke="#0284c7" strokeWidth={2} />
+          <text x={pubPositions[i].x + NODE_W / 2} y={pubPositions[i].y + NODE_H / 2 + 1} textAnchor="middle" dominantBaseline="middle" fill="#f0f9ff" fontSize={fontSize} fontWeight="700">
+            {pub.name.length > 16 ? pub.name.slice(0, 15) + "…" : pub.name}
           </text>
         </g>
       ))}
 
       {topics.map((topic, i) => {
-        const fieldStr = topic.fields?.slice(0,3).map((f)=>f.name).join(", ");
+        const fieldStr = topic.fields?.slice(0, 3).map((f) => f.name).join(", ");
         return (
           <g key={`topic-${topic.name}`}>
-            <rect x={topicPositions[i].x} y={topicPositions[i].y} width={TOPIC_W} height={TOPIC_H} rx={6} fill="#1f2937" stroke="#4b5563" strokeWidth={1.5} />
-            <text x={topicPositions[i].x+TOPIC_W/2} y={topicPositions[i].y+(fieldStr&&!compact?TOPIC_H/2-5:TOPIC_H/2+1)} textAnchor="middle" dominantBaseline="middle" fill="#d1d5db" fontSize={fontSize} fontWeight="600">{topic.name}</text>
-            {fieldStr && !compact && <text x={topicPositions[i].x+TOPIC_W/2} y={topicPositions[i].y+TOPIC_H/2+8} textAnchor="middle" dominantBaseline="middle" fill="#6b7280" fontSize={8}>{fieldStr.length>22?fieldStr.slice(0,21)+"…":fieldStr}</text>}
+            <rect x={topicPositions[i].x} y={topicPositions[i].y} width={TOPIC_W} height={TOPIC_H} rx={10} fill="#1e293b" fillOpacity={0.7} stroke="#475569" strokeWidth={1.5} />
+            <text x={topicPositions[i].x + TOPIC_W / 2} y={topicPositions[i].y + (fieldStr && !compact ? TOPIC_H / 2 - 5 : TOPIC_H / 2 + 1)} textAnchor="middle" dominantBaseline="middle" fill="#e2e8f0" fontSize={fontSize} fontWeight="700">{topic.name}</text>
+            {fieldStr && !compact && <text x={topicPositions[i].x + TOPIC_W / 2} y={topicPositions[i].y + TOPIC_H / 2 + 8} textAnchor="middle" dominantBaseline="middle" fill="#64748b" fontSize={9} fontWeight="500">{fieldStr.length > 22 ? fieldStr.slice(0, 21) + "…" : fieldStr}</text>}
           </g>
         );
       })}
 
       {subscribers.map((sub, i) => (
         <g key={`sub-${sub.name}`}>
-          <rect x={subPositions[i].x} y={subPositions[i].y} width={NODE_W} height={NODE_H} rx={8} fill="#064e3b" stroke="#10b981" strokeWidth={1.5} />
-          <text x={subPositions[i].x+NODE_W/2} y={subPositions[i].y+NODE_H/2+1} textAnchor="middle" dominantBaseline="middle" fill="#e2e8f0" fontSize={fontSize} fontWeight="600">
-            {sub.name.length > 16 ? sub.name.slice(0,15)+"…" : sub.name}
+          <rect x={subPositions[i].x} y={subPositions[i].y} width={NODE_W} height={NODE_H} rx={12} fill="#065f46" fillOpacity={0.3} stroke="#059669" strokeWidth={2} />
+          <text x={subPositions[i].x + NODE_W / 2} y={subPositions[i].y + NODE_H / 2 + 1} textAnchor="middle" dominantBaseline="middle" fill="#ecfdf5" fontSize={fontSize} fontWeight="700">
+            {sub.name.length > 16 ? sub.name.slice(0, 15) + "…" : sub.name}
           </text>
         </g>
       ))}

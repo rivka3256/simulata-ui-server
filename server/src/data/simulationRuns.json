@@ -1,275 +1,250 @@
 [
   {
-    "simulation_run_id": "sr-0001-aaaa-bbbb-cccc-dddddddddddd",
-    "simulation_config_id": "sc-0001-aaaa-bbbb-cccc-dddddddddddd",
-    "status": "passed",
-    "start_time": "2024-11-01T10:00:00.000Z",
-    "end_time": "2024-11-01T10:00:04.231Z",
-    "logs": [
-      {
-        "logs_result_id": "lr-0001-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "SensorData",
-          "count": 100,
-          "timestamps": ["2024-11-01T10:00:00.100Z", "2024-11-01T10:00:00.200Z"]
-        },
-        "message_received": {
-          "topic": "SensorData",
-          "count": 100,
-          "timestamps": ["2024-11-01T10:00:00.115Z", "2024-11-01T10:00:00.215Z"]
-        }
-      },
-      {
-        "logs_result_id": "lr-0002-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "CommandData",
-          "count": 50,
-          "timestamps": ["2024-11-01T10:00:01.000Z", "2024-11-01T10:00:01.200Z"]
-        },
-        "message_received": {
-          "topic": "CommandData",
-          "count": 50,
-          "timestamps": ["2024-11-01T10:00:01.012Z", "2024-11-01T10:00:01.212Z"]
-        }
-      }
-    ],
-    "analysis": {
-      "analyzed_simulation_result_id": "ar-0001-aaaa-bbbb-cccc-dddddddddddd",
-      "calculated_latency": 12.5,
-      "lost_message_count": 0,
-      "anomalies": null,
-      "s3_link": "s3://simulata-results/runs/sr-0001/report.json",
-      "contractResults": [
-        {
-          "contract_result_id": "cr-0001-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 12.5,
-          "throughput": 100.0,
-          "error_details": null,
-          "error_count": 0
-        },
-        {
-          "contract_result_id": "cr-0002-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0002-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 11.8,
-          "throughput": 50.0,
-          "error_details": null,
-          "error_count": 0
-        }
-      ]
+    "simulation_run_id": "a3856ce0-d131-48c2-91a5-9e858bf2201a",
+    "simulation_config_id": "sim-1",
+    "status": "Passed",
+    "start_time": "2026-05-18T09:51:31.109Z",
+    "end_time": "2026-05-18T09:51:36.109Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "adcff8e4-b82e-4737-8c95-cbdcf0361aed",
+    "simulation_config_id": "sim-1",
+    "status": "Failed",
+    "start_time": "2026-05-18T10:00:32.397Z",
+    "end_time": "2026-05-18T10:00:37.397Z",
+    "results": {
+      "success_rate": 0,
+      "error": 0,
+      "messages_sent": 0,
+      "messages_received": 0
     }
   },
   {
-    "simulation_run_id": "sr-0002-aaaa-bbbb-cccc-dddddddddddd",
-    "simulation_config_id": "sc-0002-aaaa-bbbb-cccc-dddddddddddd",
-    "status": "failed",
-    "start_time": "2024-11-05T11:00:00.000Z",
-    "end_time": "2024-11-05T11:00:07.812Z",
-    "logs": [
-      {
-        "logs_result_id": "lr-0003-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "MetricsTopic",
-          "count": 200,
-          "timestamps": ["2024-11-05T11:00:00.100Z"]
-        },
-        "message_received": {
-          "topic": "MetricsTopic",
-          "count": 183,
-          "timestamps": ["2024-11-05T11:00:00.118Z"]
-        }
-      }
-    ],
-    "analysis": {
-      "analyzed_simulation_result_id": "ar-0002-aaaa-bbbb-cccc-dddddddddddd",
-      "calculated_latency": 45.3,
-      "lost_message_count": 17,
-      "anomalies": {
-        "high_latency_spikes": 3,
-        "dropped_packets": 17
-      },
-      "s3_link": "s3://simulata-results/runs/sr-0002/report.json",
-      "contractResults": [
-        {
-          "contract_result_id": "cr-0003-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0003-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 45.3,
-          "throughput": 183.0,
-          "error_details": "17 messages lost due to QoS mismatch on MetricsTopic",
-          "error_count": 17
-        }
-      ]
+    "simulation_run_id": "57bc93ca-ecf2-4925-90c9-c7ae15db1be9",
+    "simulation_config_id": "sim-1",
+    "status": "Passed",
+    "start_time": "2026-05-18T10:24:29.573Z",
+    "end_time": "2026-05-18T10:24:34.573Z",
+    "results": {
+      "success_rate": 0,
+      "error": 0,
+      "messages_sent": 0,
+      "messages_received": 0
     }
   },
   {
-    "simulation_run_id": "sr-0003-aaaa-bbbb-cccc-dddddddddddd",
-    "simulation_config_id": "sc-0003-aaaa-bbbb-cccc-dddddddddddd",
-    "status": "passed",
-    "start_time": "2024-11-10T14:30:00.000Z",
-    "end_time": "2024-11-10T14:30:09.554Z",
-    "logs": [
-      {
-        "logs_result_id": "lr-0004-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "SensorData",
-          "count": 500,
-          "timestamps": ["2024-11-10T14:30:00.100Z"]
-        },
-        "message_received": {
-          "topic": "SensorData",
-          "count": 500,
-          "timestamps": ["2024-11-10T14:30:00.108Z"]
-        }
-      },
-      {
-        "logs_result_id": "lr-0005-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "CommandData",
-          "count": 300,
-          "timestamps": ["2024-11-10T14:30:01.000Z"]
-        },
-        "message_received": {
-          "topic": "CommandData",
-          "count": 300,
-          "timestamps": ["2024-11-10T14:30:01.009Z"]
-        }
-      },
-      {
-        "logs_result_id": "lr-0006-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "GlobalStatus",
-          "count": 100,
-          "timestamps": ["2024-11-10T14:30:02.000Z"]
-        },
-        "message_received": {
-          "topic": "GlobalStatus",
-          "count": 100,
-          "timestamps": ["2024-11-10T14:30:02.007Z"]
-        }
-      }
-    ],
-    "analysis": {
-      "analyzed_simulation_result_id": "ar-0003-aaaa-bbbb-cccc-dddddddddddd",
-      "calculated_latency": 8.2,
-      "lost_message_count": 0,
-      "anomalies": null,
-      "s3_link": "s3://simulata-results/runs/sr-0003/report.json",
-      "contractResults": [
-        {
-          "contract_result_id": "cr-0004-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0004-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 8.0,
-          "throughput": 500.0,
-          "error_details": null,
-          "error_count": 0
-        },
-        {
-          "contract_result_id": "cr-0005-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0005-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 9.0,
-          "throughput": 300.0,
-          "error_details": null,
-          "error_count": 0
-        },
-        {
-          "contract_result_id": "cr-0006-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0006-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 7.5,
-          "throughput": 100.0,
-          "error_details": null,
-          "error_count": 0
-        }
-      ]
+    "simulation_run_id": "0027ad0d-554a-4e79-a438-92f3f3bfc8ae",
+    "simulation_config_id": "sim-1",
+    "status": "Failed",
+    "start_time": "2026-05-18T10:36:11.059Z",
+    "end_time": "2026-05-18T10:36:16.059Z",
+    "results": {
+      "success_rate": 0,
+      "error": 0,
+      "messages_sent": 0,
+      "messages_received": 0
     }
   },
   {
-    "simulation_run_id": "sr-0004-aaaa-bbbb-cccc-dddddddddddd",
-    "simulation_config_id": "sc-0001-aaaa-bbbb-cccc-dddddddddddd",
-    "status": "failed",
-    "start_time": "2024-11-12T09:00:00.000Z",
-    "end_time": "2024-11-12T09:00:05.100Z",
-    "logs": [
-      {
-        "logs_result_id": "lr-0007-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "SensorData",
-          "count": 100,
-          "timestamps": ["2024-11-12T09:00:00.100Z"]
-        },
-        "message_received": {
-          "topic": "SensorData",
-          "count": 72,
-          "timestamps": ["2024-11-12T09:00:00.130Z"]
-        }
-      }
-    ],
-    "analysis": {
-      "analyzed_simulation_result_id": "ar-0004-aaaa-bbbb-cccc-dddddddddddd",
-      "calculated_latency": 88.7,
-      "lost_message_count": 28,
-      "anomalies": {
-        "timeout_events": 5,
-        "dropped_packets": 28,
-        "qos_violations": 2
-      },
-      "s3_link": "s3://simulata-results/runs/sr-0004/report.json",
-      "contractResults": [
-        {
-          "contract_result_id": "cr-0007-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0001-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 88.7,
-          "throughput": 72.0,
-          "error_details": "28 messages dropped - network congestion detected. 2 QoS policy violations.",
-          "error_count": 28
-        }
-      ]
-    }
+    "simulation_run_id": "ee402f5a-3a24-47d4-9025-d092bf0c1c32",
+    "simulation_config_id": "d1cbb658-58e7-4d33-b976-2878f9cbf381",
+    "simulation_name": "ררר",
+    "status": "Passed",
+    "start_time": "2026-05-19T09:34:44.948Z",
+    "end_time": "2026-05-19T09:34:59.948Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
   },
   {
-    "simulation_run_id": "sr-0005-aaaa-bbbb-cccc-dddddddddddd",
-    "simulation_config_id": "sc-0004-aaaa-bbbb-cccc-dddddddddddd",
-    "status": "passed",
-    "start_time": "2024-11-20T12:00:00.000Z",
-    "end_time": "2024-11-20T12:00:02.310Z",
-    "logs": [
-      {
-        "logs_result_id": "lr-0008-aaaa-bbbb-cccc-dddddddddddd",
-        "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
-        "message_sent": {
-          "topic": "TelemetryStream",
-          "count": 10,
-          "timestamps": ["2024-11-20T12:00:00.100Z"]
-        },
-        "message_received": {
-          "topic": "TelemetryStream",
-          "count": 10,
-          "timestamps": ["2024-11-20T12:00:00.105Z"]
-        }
-      }
-    ],
-    "analysis": {
-      "analyzed_simulation_result_id": "ar-0005-aaaa-bbbb-cccc-dddddddddddd",
-      "calculated_latency": 5.1,
-      "lost_message_count": 0,
-      "anomalies": null,
-      "s3_link": "s3://simulata-results/runs/sr-0005/report.json",
-      "contractResults": [
-        {
-          "contract_result_id": "cr-0008-aaaa-bbbb-cccc-dddddddddddd",
-          "contract_config_id": "cc-0007-aaaa-bbbb-cccc-dddddddddddd",
-          "latency_avg_ms": 5.1,
-          "throughput": 10.0,
-          "error_details": null,
-          "error_count": 0
-        }
-      ]
-    }
+    "simulation_run_id": "c6f9ab17-772c-4f87-b506-2eca3808dc6a",
+    "simulation_config_id": "3947ac84-09d9-4f46-9872-4eeff135983d",
+    "simulation_name": "י יל",
+    "status": "Passed",
+    "start_time": "2026-05-19T09:35:19.673Z",
+    "end_time": "2026-05-19T09:35:34.673Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "2679e35a-11d6-40ef-b207-f35f2f275f1b",
+    "simulation_config_id": "a76e921e-91d7-4fe4-8497-5d10fb002291",
+    "simulation_name": " אאא",
+    "status": "Passed",
+    "start_time": "2026-05-19T09:38:58.997Z",
+    "end_time": "2026-05-19T09:39:13.997Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "2ebf952e-fc53-466a-95c0-9c2bca716fcf",
+    "simulation_config_id": "262bb917-c8dd-4a07-a55e-c660dde32f85",
+    "simulation_name": "ננננ",
+    "status": "Passed",
+    "start_time": "2026-05-19T09:49:26.774Z",
+    "end_time": "2026-05-19T09:49:41.774Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "4d5a9182-de78-4e15-84fe-9467fb028016",
+    "simulation_config_id": "d1cbb658-58e7-4d33-b976-2878f9cbf381",
+    "simulation_name": "ררר",
+    "status": "Passed",
+    "start_time": "2026-05-19T09:51:05.020Z",
+    "end_time": "2026-05-19T09:51:20.020Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "b7222524-3247-494b-976d-7563087a6691",
+    "simulation_config_id": "d1cbb658-58e7-4d33-b976-2878f9cbf381",
+    "simulation_name": "ררר",
+    "status": "Passed",
+    "start_time": "2026-05-19T12:58:31.606Z",
+    "end_time": "2026-05-19T12:58:46.606Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "b02a5cf8-e4ff-4a66-ab4c-72b0731035e8",
+    "simulation_config_id": "39b6c23e-399a-40cc-b66d-87de8bbd3626",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)",
+    "status": "Passed",
+    "start_time": "2026-05-19T13:03:29.607Z",
+    "end_time": "2026-05-19T13:03:44.607Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "66291519-198a-45d0-94e7-daff18ccd23d",
+    "simulation_config_id": "cdb44874-898f-4fb1-bdda-2c5f5502038d",
+    "simulation_name": "(Radar_System_Alpha)-(Weapon_Launcher_Bay)א",
+    "status": "Passed",
+    "start_time": "2026-05-20T05:28:05.372Z",
+    "end_time": "2026-05-20T05:28:20.372Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "fe23855c-9335-4f13-8052-15cfd557ea6d",
+    "simulation_config_id": "047cbad3-0ccf-40ee-9e14-1499773b7ef6",
+    "simulation_name": "(Radar_System_Alpha)-(Command_Control_Center)rivka",
+    "status": "Failed",
+    "start_time": "2026-05-20T05:57:26.002Z",
+    "end_time": "2026-05-20T05:57:41.002Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 115,
+      "success_rate": 96,
+      "errors": 5
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "58f5b60d-201f-4946-8dbd-f2553e17d861",
+    "simulation_config_id": "cdb44874-898f-4fb1-bdda-2c5f5502038d",
+    "simulation_name": "(Radar_System_Alpha)-(Weapon_Launcher_Bay)א",
+    "status": "Passed",
+    "start_time": "2026-05-20T05:58:27.863Z",
+    "end_time": "2026-05-20T05:58:42.863Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "db7f5540-5784-4797-80b4-2b090bed66af",
+    "simulation_config_id": "ccd2afef-56f4-48c7-b200-5e7168405b97",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)A",
+    "status": "Passed",
+    "start_time": "2026-05-20T06:48:39.901Z",
+    "end_time": "2026-05-20T06:48:54.901Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "1036c579-0727-45e5-9734-9cc34346c22e",
+    "simulation_config_id": "ccd2afef-56f4-48c7-b200-5e7168405b97",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)A",
+    "status": "Passed",
+    "start_time": "2026-05-20T06:52:20.522Z",
+    "end_time": "2026-05-20T06:52:35.522Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "6fdc7af9-3699-4a0a-9bee-01b1d74c3bc2",
+    "simulation_config_id": "1582a9ad-6f8b-4d8b-a83e-07e90db1d349",
+    "simulation_name": "(Command_Control_Center)-(Intelligence_Database)",
+    "status": "Passed",
+    "start_time": "2026-05-20T07:19:40.737Z",
+    "end_time": "2026-05-20T07:19:55.737Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
   }
 ]

@@ -1,0 +1,419 @@
+[
+  {
+    "simulation_config_id": "39b6c23e-399a-40cc-b66d-87de8bbd3626",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-1",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-5",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 8,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-19T12:54:56.181Z"
+  },
+  {
+    "simulation_config_id": "c0d4f7b9-d2a1-46f2-a82b-a8a6c8458d67",
+    "simulation_name": "(Command_Control_Center)-(Drone_Swarm_Controller)",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-2",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-9",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 100,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-3",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 200,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-19T13:03:07.954Z"
+  },
+  {
+    "simulation_config_id": "cdb44874-898f-4fb1-bdda-2c5f5502038d",
+    "simulation_name": "(Radar_System_Alpha)-(Weapon_Launcher_Bay)א",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-1",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-5",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-19T13:10:17.406Z"
+  },
+  {
+    "simulation_config_id": "047cbad3-0ccf-40ee-9e14-1499773b7ef6",
+    "simulation_name": "(Radar_System_Alpha)-(Command_Control_Center)rivka",
+    "configuration_details": {
+      "latency_ms": 7,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-2",
+          "contract_config_id": "cont-3-v4.0",
+          "abc_version_id": "abc-8",
+          "entities": [
+            {
+              "entity_id": "dr-3",
+              "name": "Command_Listener",
+              "type": "reader",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            },
+            {
+              "entity_id": "dw-3",
+              "name": "Command_Issuer",
+              "type": "writer",
+              "message_count": 50,
+              "message_frequency_hz": 2
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-19T13:14:01.960Z"
+  },
+  {
+    "simulation_config_id": "46f8f9e3-04a7-454e-849e-6ce66feeb0dc",
+    "simulation_name": "(Weapon_Launcher_Bay)-(Command_Control_Center)example1",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-3",
+          "contract_config_id": "cont-1-v1.3",
+          "abc_version_id": "abc-6",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-2",
+          "contract_config_id": "cont-3-v4.0",
+          "abc_version_id": "abc-12",
+          "entities": [
+            {
+              "entity_id": "dr-3",
+              "name": "Command_Listener",
+              "type": "reader",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            },
+            {
+              "entity_id": "dw-3",
+              "name": "Command_Issuer",
+              "type": "writer",
+              "message_count": 50,
+              "message_frequency_hz": 2
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-20T06:07:08.874Z"
+  },
+  {
+    "simulation_config_id": "7f3bc003-76c6-4a8f-a00a-acca8e4e1c9e",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)Ab",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-1",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-3",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-20T06:14:49.930Z"
+  },
+  {
+    "simulation_config_id": "ccd2afef-56f4-48c7-b200-5e7168405b97",
+    "simulation_name": "(Radar_System_Alpha)-(Drone_Swarm_Controller)b",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-1",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-5",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-20T06:48:31.372Z"
+  },
+  {
+    "simulation_config_id": "1582a9ad-6f8b-4d8b-a83e-07e90db1d349",
+    "simulation_name": "(Command_Control_Center)-(Intelligence_Database)",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-2",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-1",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        },
+        {
+          "system_id": "sys-5",
+          "contract_config_id": "cont-3-v4.0",
+          "abc_version_id": "abc-12",
+          "entities": [
+            {
+              "entity_id": "dr-3",
+              "name": "Command_Listener",
+              "type": "reader",
+              "message_count": 100,
+              "message_frequency_hz": 10
+            },
+            {
+              "entity_id": "dw-3",
+              "name": "Command_Issuer",
+              "type": "writer",
+              "message_count": 50,
+              "message_frequency_hz": 2
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-20T06:55:10.065Z"
+  }
+]

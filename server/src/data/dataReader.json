@@ -1,0 +1,37 @@
+[
+  {
+    "data_reader_id": "dr-1",
+    "contract_config_id": "cont-1",
+    "name": "Track_Subscriber_A",
+    "message_count": 1000,
+    "message_frequency_hz": 50
+  },
+  {
+    "data_reader_id": "dr-2",
+    "contract_config_id": "cont-1",
+    "name": "Track_Subscriber_B",
+    "message_count": 500, 
+    "message_frequency_hz": 25
+  },
+  {
+    "data_reader_id": "dr-3",
+    "contract_config_id": "cont-3",
+    "name": "Command_Listener",
+    "message_count": 100,
+    "message_frequency_hz": 10
+  },
+  {
+    "data_reader_id": "dr-4",
+    "contract_config_id": "cont-4",
+    "name": "Telemetry_Monitor",
+    "message_count": 5000,
+    "message_frequency_hz": 100
+  },
+  {
+    "data_reader_id": "dr-5",
+    "contract_config_id": "cont-5",
+    "name": "Drone_Data_Parser",
+    "message_count": 2000,
+    "message_frequency_hz": 60
+  }
+]
