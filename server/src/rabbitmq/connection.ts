@@ -25,7 +25,7 @@ export async function connect(): Promise<void> {
   isConnecting = true;
 
   try {
-    // console.log('[RabbitMQ] Connecting to', RABBITMQ_CONFIG.url);
+    console.log('[RabbitMQ] Connecting to', RABBITMQ_CONFIG.url);
     connection = await amqplib.connect(RABBITMQ_CONFIG.url);
     channel = await connection.createConfirmChannel();
 
@@ -43,7 +43,7 @@ export async function connect(): Promise<void> {
 
     console.log('[RabbitMQ] Connected and topology ready');
   } catch (err: any) {
-    // console.error('[RabbitMQ] Failed to connect:', err.message);
+    console.error('[RabbitMQ] Failed to connect:', err.message);
     scheduleReconnect();
   } finally {
     isConnecting = false;

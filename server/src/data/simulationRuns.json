@@ -246,5 +246,50 @@
       "errors": 0
     },
     "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "e7069179-ec6d-45c6-a486-5c429e7ed51a",
+    "simulation_config_id": "46f8f9e3-04a7-454e-849e-6ce66feeb0dc",
+    "simulation_name": "(Weapon_Launcher_Bay)-(Command_Control_Center)example1",
+    "status": "Passed",
+    "start_time": "2026-05-20T08:12:16.347Z",
+    "end_time": "2026-05-20T08:12:31.347Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "653d6667-b76f-4712-b70d-6cf9301d0c64",
+    "simulation_config_id": "1582a9ad-6f8b-4d8b-a83e-07e90db1d349",
+    "simulation_name": "(Command_Control_Center)-(Intelligence_Database)",
+    "status": "Passed",
+    "start_time": "2026-05-20T08:18:24.730Z",
+    "end_time": "2026-05-20T08:18:39.730Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "eaaa8cb0-3885-4f19-8bdb-3e2e9a042862",
+    "simulation_config_id": "1582a9ad-6f8b-4d8b-a83e-07e90db1d349",
+    "simulation_name": "(Command_Control_Center)-(Intelligence_Database)",
+    "status": "Passed",
+    "start_time": "2026-05-20T08:22:22.332Z",
+    "end_time": "2026-05-20T08:22:37.332Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
   }
 ]

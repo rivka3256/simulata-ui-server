@@ -241,11 +241,12 @@ export const SimulationRunController = {
             await writeData('simulationRuns', runs);
             
             return res.status(201).json({ 
-                message: 'Simulation started successfully for 15 seconds', 
+                message: 'Simulation run triggered, verified by RabbitMQ (Code & YAML), and logged successfully', 
                 run: newRun 
             });
-        } catch (error) {
-            return res.status(500).json({ message: 'Error starting simulation' });
-        }
+            } catch (error) {
+                        console.error("Critical error during simulation dispatch:", error);
+                        return res.status(500).json({ message: 'Simulation failed to start due to internal pipeline infrastructure issue' });
+                    }
     }
 };
