@@ -1,11 +1,5 @@
-// import { useState, useEffect } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import {
-//   ChevronLeft, Save, ArrowLeftRight,
-//   Monitor, Radio, Database,
-// } from 'lucide-react';
-// import { useToast } from '../components/Toast';
 
+<<<<<<< HEAD
 // // API Imports
 // import { createSimulation, updateSimulation, getSimulationById, getAllSimulations } from '../api/simulations';
 // import { getAllSystems } from '../api/systems';
@@ -592,6 +586,8 @@
 
 // export default NewSimulation;
 
+=======
+>>>>>>> 891252009d79395bb2dab802b71edb5f0c7dac34
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -1150,6 +1146,7 @@ const NewSimulation = () => {
 };
 
 export default NewSimulation;
+<<<<<<< HEAD
 
 
 // import { useState, useEffect } from 'react';
@@ -1775,3 +1772,5 @@ export default NewSimulation;
 // };
 
 // export default NewSimulation;
+=======
+>>>>>>> 891252009d79395bb2dab802b71edb5f0c7dac34
