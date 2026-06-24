@@ -32,7 +32,7 @@ export const SimulationConfigController = {
         } catch (error) {
             res.status(500).json({ message: 'Error fetching simulation' });
         }
-    },
+    }, 
 
     getByName: async (req: Request, res: Response) => {
         try {

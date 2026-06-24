@@ -291,5 +291,35 @@
       "errors": 0
     },
     "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "dcaca451-b9a7-4050-bb22-db6a06ebb732",
+    "simulation_config_id": "cdb44874-898f-4fb1-bdda-2c5f5502038d",
+    "simulation_name": "(Radar_System_Alpha)-(Weapon_Launcher_Bay)א",
+    "status": "Passed",
+    "start_time": "2026-05-24T04:33:12.791Z",
+    "end_time": "2026-05-24T04:33:27.791Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
+  },
+  {
+    "simulation_run_id": "693c1d05-6b24-4dd0-aad4-f3a46c7dda77",
+    "simulation_config_id": "c0d4f7b9-d2a1-46f2-a82b-a8a6c8458d67",
+    "simulation_name": "(Command_Control_Center)-(Drone_Swarm_Controller)",
+    "status": "Passed",
+    "start_time": "2026-06-14T10:37:32.046Z",
+    "end_time": "2026-06-14T10:37:47.046Z",
+    "results": {
+      "messages_sent": 120,
+      "messages_received": 120,
+      "success_rate": 100,
+      "errors": 0
+    },
+    "duration_seconds": 15
   }
 ]

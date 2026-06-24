@@ -7,7 +7,7 @@ import type { Contract, DataEntity } from '../types/api';
 export const getAllContracts = (): Promise<Contract[]> => {
   return apiFetch('/contracts');
 };
-
+ 
 // שליפת הרכיבים המשולבים
 export const getContractEntities = async (contractId: string): Promise<DataEntity[]> => {
   try {

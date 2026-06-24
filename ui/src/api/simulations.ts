@@ -13,7 +13,7 @@ export async function createSimulation(data: Partial<SimulationConfig>) {
     return apiFetch<SimulationConfig>('/simulations', {
         method: 'POST',
         body: JSON.stringify(data),
-    });
+    }); 
 }
 
 export async function updateSimulation(id: string, data: Partial<SimulationConfig>) {

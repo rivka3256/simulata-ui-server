@@ -1,7 +1,25 @@
+
 export interface System {
   system_id: string;
   name: string;
-  description: string;
+  abc_version_id: string; 
+  contracts: Contract[]; 
+}
+
+export interface DataReader {
+  data_reader_id: string;
+  contract_config_id: string;
+  name: string;
+  message_count: number;
+  message_frequency_hz: number;
+}
+
+export interface DataWriter {
+  data_writer_id: string;
+  contract_config_id: string;
+  name: string;
+  message_count: number;
+  message_frequency_hz: number;
 }
 
 export interface Contract {
@@ -9,46 +27,15 @@ export interface Contract {
   system_id: string;
   name: string;
   version: string;
+  data_readers: DataReader[]; 
+  data_writers: DataWriter[]; 
 }
 
-export interface DataEntity {
-  data_reader_id?: string;
-  data_writer_id?: string;
-  entity_id?: string; // שדה עזר משולב
-  contract_config_id: string;
-  name: string;
-  message_count: number;
-  message_frequency_hz: number;
-  type?: 'reader' | 'writer'; // מאפשר ל-UI לדעת בקלות מה סוג הרכיב
-}
-
-// 🌟 טיפוס חדש לגרסאות פרוטוקול ABC
-export interface AbcVersion {
-  abc_version_id: string; 
-  contract_config_id: string;
-  abc_version_name: string;
-  release_date?: string;
-}
-
-// 🌟 המבנה החדש והמשולב של קונפיגורציית סימולציה
 export interface SimulationConfig {
   simulation_config_id: string;
   simulation_name: string;
   created_at: string;
-  configuration_details: {
-    systems: Array<{
-      system_id: string;
-      contract_config_id: string;
-      abc_version_id: string; // ה-Dropdown החדש!
-      entities: Array<{
-        entity_id: string; // המזהה של ה-DR או ה-DW
-        name: string;
-        type: 'reader' | 'writer';
-        message_count: number;
-        message_frequency_hz: number;
-      }>;
-    }>;
-  };
+  systems: System[];
 }
 
 export interface SimulationRun {

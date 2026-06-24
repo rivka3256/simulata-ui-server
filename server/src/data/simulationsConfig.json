@@ -468,5 +468,58 @@
       ]
     },
     "created_at": "2026-05-20T08:27:39.444Z"
+  },
+  {
+    "simulation_config_id": "165a610d-896c-4938-964c-3707859b07ea",
+    "simulation_name": "(Drone_Swarm_Controller)-(Command_Control_Center)aaa",
+    "configuration_details": {
+      "latency_ms": 0,
+      "jitter_ms": 0,
+      "systems": [
+        {
+          "system_id": "sys-4",
+          "contract_config_id": "cont-2-v1.0",
+          "abc_version_id": "abc-7",
+          "entities": [
+            {
+              "entity_id": "dw-2",
+              "name": "Status_Broadcaster",
+              "type": "writer",
+              "message_count": 100,
+              "message_frequency_hz": 5
+            }
+          ]
+        },
+        {
+          "system_id": "sys-2",
+          "contract_config_id": "cont-1-v1.2",
+          "abc_version_id": "abc-5",
+          "entities": [
+            {
+              "entity_id": "dr-1",
+              "name": "Track_Subscriber_A",
+              "type": "reader",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            },
+            {
+              "entity_id": "dr-2",
+              "name": "Track_Subscriber_B",
+              "type": "reader",
+              "message_count": 500,
+              "message_frequency_hz": 25
+            },
+            {
+              "entity_id": "dw-1",
+              "name": "Track_Publisher",
+              "type": "writer",
+              "message_count": 1000,
+              "message_frequency_hz": 50
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-05-20T10:09:26.248Z"
   }
 ]

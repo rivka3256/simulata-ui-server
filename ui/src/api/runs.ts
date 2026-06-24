@@ -16,7 +16,7 @@ export async function getRunById(runId: string) {
 
 export async function getRunEvents(runId: string) {
     return apiFetch<any[]>(`/runs/${runId}/events`);
-} 
+}  
 
 export async function stopRun(runId: string) {
     return apiFetch<any>(`/runs/${runId}/stop`, {
